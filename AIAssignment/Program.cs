@@ -22,8 +22,6 @@ namespace AIAssignment
                 char.TryParse(Console.ReadLine(), out input);
 
 
-                if (input != null)
-                {
                     input = Char.ToLower(input);
                     switch (input)
                     {
@@ -42,7 +40,6 @@ namespace AIAssignment
                             Console.WriteLine("Please only input A, B or Q to exit (not case sensitive).");
                             break;
                     }
-                }
 
                 Console.ReadKey();
             }

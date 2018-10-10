@@ -45,6 +45,7 @@
     <Compile Include="BayesainNetwork.cs" />
     <Compile Include="BayesianCalculator.cs" />
     <Compile Include="BayesianManager.cs" />
+    <Compile Include="Category.cs" />
     <Compile Include="Evidence.cs" />
     <Compile Include="Probability.cs" />
     <Compile Include="Program.cs" />
@@ -54,6 +55,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Speech.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
