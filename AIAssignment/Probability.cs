@@ -1,4 +1,9 @@
-﻿using System;
+﻿// Project: AIAssignment
+// Filename; Probability.cs
+// Created; 10/10/2018
+// Edited: 11/10/2018
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,12 +13,33 @@ namespace AIAssignment
 {
     public class Probability
     {
-        private string m_Word;
+        /// <summary>
+        /// The word.
+        /// </summary>
+        private readonly string m_Word;
 
-        private int m_Count;
+        /// <summary>
+        /// The count of occurrences
+        /// </summary>
+        private readonly int m_Count;
 
-        private double m_Probability;
+        /// <summary>
+        /// The probability of the word occurring
+        /// </summary>
+        private readonly double m_Probability;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Probability"/> class.
+        /// </summary>
+        /// <param name="word">
+        /// The word.
+        /// </param>
+        /// <param name="count">
+        /// The count of occurrences
+        /// </param>
+        /// <param name="probability">
+        /// The probability of the word occurring
+        /// </param>
         public Probability(string word, int count, double probability)
         {
             this.m_Word = word;
@@ -21,21 +47,36 @@ namespace AIAssignment
             this.m_Probability = probability;
         }
 
+        /// <summary>
+        /// Gets the word.
+        /// </summary>
         public string Word
         {
             get => m_Word;
         }
 
+        /// <summary>
+        /// Gets the count.
+        /// </summary>
         public int Count
         {
             get => m_Count;
         }
 
+        /// <summary>
+        /// Gets the probability of occurrence.
+        /// </summary>
         public double ProbabilityOfOccurrence
         {
             get => m_Probability;
         }
 
+        /// <summary>
+        /// The word, count, probability laid out as such
+        /// </summary>
+        /// <returns>
+        /// The <see cref="string"/> of word, count, probability.
+        /// </returns>
         public override string ToString()
         {
             return this.m_Word + ", " + this.m_Count + ", " + this.m_Probability;

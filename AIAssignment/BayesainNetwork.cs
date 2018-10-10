@@ -1,4 +1,9 @@
-﻿using System;
+﻿// Project: AIAssignment
+// Filename; BayesainNetwork.cs
+// Created; 10/10/2018
+// Edited: 11/10/2018
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,8 +12,6 @@ using System.IO;
 
 namespace AIAssignment
 {
-    using System.Xml.XPath;
-
 
     public class BayesainNetwork
     {
@@ -25,7 +28,7 @@ namespace AIAssignment
         /// <summary>
         /// Party names based off selected data
         /// </summary>
-        private List<Category> m_Categories = new List<Category>();
+        private readonly List<Category> m_Categories = new List<Category>();
 
         /// <summary>
         /// Starts the training process
@@ -34,10 +37,9 @@ namespace AIAssignment
         {
             this.m_TrainingDataFiles = new List<Speech>();
             this.GetTrainingData();
-            this.SetCatagories();
+            this.SetCategories();
             this.CalculateCategoryProbabilities();
         }
-
 
         /// <summary>
         /// Reads the training files and asks the user which they wish to use
@@ -53,7 +55,7 @@ namespace AIAssignment
 
             //Write all the files inside of the directory
             Console.WriteLine(@"Possible files found: " + possibleTrainingFiles.Length + ".\n");
-            for (int i = 0;i < possibleTrainingFiles.Length; ++i)
+            for (int i = 0; i < possibleTrainingFiles.Length; ++i)
             {
                 Console.WriteLine(i + 1 + @") " + possibleTrainingFiles[i]);
             }
@@ -62,7 +64,7 @@ namespace AIAssignment
             {
                 bool badInput = false;
                 retry = false;
-                
+
                 Console.WriteLine(@"Please select which you wish to use (Separate selection with a comma ',').");
 
                 string input = Console.ReadLine();
@@ -109,7 +111,10 @@ namespace AIAssignment
             while (retry);
         }
 
-        private void SetCatagories()
+        /// <summary>
+        /// Sets the categories for the speeches and adds them to list
+        /// </summary>
+        private void SetCategories()
         {
             foreach (Speech file in this.m_TrainingDataFiles)
             {
@@ -121,11 +126,12 @@ namespace AIAssignment
                         if (!this.m_Categories.Any(x => x.ToString() == name))
                         {
                             this.m_Categories.Add(new Category(name));
-                            this.m_Categories.Last().CatagorySpeeches.Add(file);
+                            this.m_Categories.Last().CategorySpeeches.Add(file);
                         }
                         else
                         {
-                            this.m_Categories[this.m_Categories.FindIndex(x => x.ToString() == name)].CatagorySpeeches.Add(file);
+                            this.m_Categories[this.m_Categories.FindIndex(x => x.ToString() == name)].CategorySpeeches
+                                .Add(file);
                         }
                     }
                 }
@@ -137,25 +143,27 @@ namespace AIAssignment
             foreach (Category c in this.m_Categories)
             {
                 c.Probability = BayesianCalculator.ProbabilityOfCategory(
-                    c.CatagorySpeeches.Count,
+                    c.CategorySpeeches.Count,
                     this.m_TrainingDataFiles.Count);
 
                 errorCheck += c.Probability;
             }
 
             //If the total does not add to 1 then there is something wrong with the math
-            if (errorCheck != 1)
+            if (errorCheck != 1.0D)
             {
                 Console.WriteLine(@"Error: Probability does not add to 100%");
                 Console.ReadLine();
             }
         }
 
+        /// <summary>
+        /// Calculates P(word|category) and saves it to a list
+        /// </summary>
         private void CalculateCategoryProbabilities()
         {
             //Used to work out total words
-            Dictionary<string,int> wordsDictionary = new Dictionary<string, int>();
-
+            Dictionary<string, int> wordsDictionary = new Dictionary<string, int>();
 
             foreach (Category category in this.m_Categories)
             {
@@ -176,10 +184,10 @@ namespace AIAssignment
                 }
             }
 
+            //Calculates P(word|category)
             foreach (Category category in this.m_Categories)
             {
                 category.CalculateWordProb(wordsDictionary.Count);
-
             }
         }
     }

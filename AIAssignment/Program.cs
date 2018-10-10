@@ -1,4 +1,9 @@
-﻿using System;
+﻿// Project: AIAssignment
+// Filename; Program.cs
+// Created; 10/10/2018
+// Edited: 11/10/2018
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,25 +26,24 @@ namespace AIAssignment
 
                 char.TryParse(Console.ReadLine(), out input);
 
-
-                    input = Char.ToLower(input);
-                    switch (input)
-                    {
-                        case 'a':
-                            //TODO: Training
-                            BayesainNetwork b = new BayesainNetwork();
-                            b.StartTraining();
-                            break;
-                        case 'b':
-                            //TODO: Classification
-                            break;
-                        case 'q':
-                            //TODO: Exit
-                            break;
-                        default:
-                            Console.WriteLine("Please only input A, B or Q to exit (not case sensitive).");
-                            break;
-                    }
+                input = Char.ToLower(input);
+                switch (input)
+                {
+                    case 'a':
+                        //TODO: Training
+                        BayesainNetwork b = new BayesainNetwork();
+                        b.StartTraining();
+                        break;
+                    case 'b':
+                        //TODO: Classification
+                        break;
+                    case 'q':
+                        //TODO: Exit
+                        break;
+                    default:
+                        Console.WriteLine("Please only input A, B or Q to exit (not case sensitive).");
+                        break;
+                }
 
                 Console.ReadKey();
             }

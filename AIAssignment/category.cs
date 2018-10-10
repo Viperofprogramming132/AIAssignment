@@ -1,4 +1,9 @@
-﻿using System;
+﻿// Project: AIAssignment
+// Filename; Category.cs
+// Created; 10/10/2018
+// Edited: 11/10/2018
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,8 +12,6 @@ using System.IO;
 
 namespace AIAssignment
 {
-    
-
     public class Category
     {
         /// <summary>
@@ -19,7 +22,7 @@ namespace AIAssignment
         /// <summary>
         /// Contains all speeches for this party/category
         /// </summary>
-        private List<Speech> m_CatagorySpeeches = new List<Speech>();
+        private List<Speech> m_CategorySpeeches = new List<Speech>();
 
         /// <summary>
         /// Probability of the speech being this party/category
@@ -27,50 +30,80 @@ namespace AIAssignment
         private double m_Probability;
 
         /// <summary>
-        /// 
+        /// Contains all the words for all the speeches in the party/category
         /// </summary>
-        Dictionary<string, int> m_CategoryWordsDictionary = new Dictionary<string, int>();
+        private readonly Dictionary<string, int> m_CategoryWordsDictionary = new Dictionary<string, int>();
 
-        private List<Probability> m_WordProbabilities = new List<Probability>();
+        /// <summary>
+        /// Contains all the words and the counts with the P(word|category)
+        /// </summary>
+        private readonly List<Probability> m_WordProbabilities = new List<Probability>();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Category"/> class. 
+        /// </summary>
+        /// <param name="name">
+        /// Name of the Category/Party
+        /// </param>
         public Category(string name)
         {
             this.m_CategoryName = name;
         }
 
-        public List<Speech> CatagorySpeeches
+        /// <summary>
+        /// Gets or sets the category speeches.
+        /// </summary>
+        public List<Speech> CategorySpeeches
         {
-            get => this.m_CatagorySpeeches;
-            set => this.m_CatagorySpeeches = value;
+            get => this.m_CategorySpeeches;
+            set => this.m_CategorySpeeches = value;
         }
 
+        /// <summary>
+        /// Gets or sets the probability.
+        /// </summary>
         public double Probability
         {
             get => m_Probability;
             set => m_Probability = value;
         }
 
+        /// <summary>
+        /// Gets the category words dictionary.
+        /// </summary>
         public Dictionary<string, int> CategoryWordsDictionary
         {
             get => this.m_CategoryWordsDictionary;
         }
 
+        /// <summary>
+        /// Gets the word probabilities.
+        /// </summary>
         public List<Probability> WordProbabilities
         {
             get => m_WordProbabilities;
         }
 
+        /// <summary>
+        /// ToString to return the name of the category
+        /// </summary>
+        /// <returns>
+        /// The <see cref="string"/> name.
+        /// </returns>
         public override string ToString()
         {
             return this.m_CategoryName;
         }
 
+        /// <summary>
+        /// Takes the speeches and adds there words to the word dictionary in the category
+        /// </summary>
         public void CondenseSpeeches()
         {
-            foreach (Speech speech in this.m_CatagorySpeeches)
+            foreach (Speech speech in this.m_CategorySpeeches)
             {
                 //Gets the word dictionaries from the speeches and adds them together
-                foreach (KeyValuePair<string,int> pair in speech.WordsDictionary)
+                foreach (KeyValuePair<string, int> pair in speech.WordsDictionary)
                 {
                     if (this.m_CategoryWordsDictionary.ContainsKey(pair.Key))
                     {
@@ -84,18 +117,24 @@ namespace AIAssignment
             }
         }
 
+        /// <summary>
+        /// The calculate word prob.
+        /// </summary>
+        /// <param name="TotalWords">
+        /// The total unique words.
+        /// </param>
         public void CalculateWordProb(int TotalWords)
         {
-            foreach (KeyValuePair<string,int> pair in CategoryWordsDictionary)
+            foreach (KeyValuePair<string, int> pair in CategoryWordsDictionary)
             {
-                this.m_WordProbabilities.Add(new Probability(pair.Key,pair.Value,BayesianCalculator.WordProbability(pair.Value, this.m_CategoryWordsDictionary.Sum(x => x.Value), TotalWords)));
-            }
-
-            double totalProbability = 0;
-
-            foreach (Probability p in m_WordProbabilities)
-            {
-                totalProbability += p.ProbabilityOfOccurrence;
+                this.m_WordProbabilities.Add(
+                    new Probability(
+                        pair.Key,
+                        pair.Value,
+                        BayesianCalculator.WordProbability(
+                            pair.Value,
+                            this.m_CategoryWordsDictionary.Sum(x => x.Value),
+                            TotalWords)));
             }
         }
     }

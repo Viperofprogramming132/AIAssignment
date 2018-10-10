@@ -1,4 +1,8 @@
-﻿
+﻿// Project: AIAssignment
+// Filename; Speech.cs
+// Created; 10/10/2018
+// Edited: 11/10/2018
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +27,7 @@ namespace AIAssignment
         /// <summary>
         /// Contains all information about the file
         /// </summary>
-        private FileInfo m_File;
+        private readonly FileInfo m_File;
 
         /// <summary>
         /// The Speech as it is before any editing
@@ -33,7 +37,7 @@ namespace AIAssignment
         /// <summary>
         /// The words and how often they occur
         /// </summary>
-        Dictionary<string,int> m_WordsDictionary = new Dictionary<string, int>();
+        readonly Dictionary<string, int> m_WordsDictionary = new Dictionary<string, int>();
 
         /// <summary>
         /// Constructor for the Speech gets all the information from the files
@@ -62,7 +66,6 @@ namespace AIAssignment
         {
             get => this.m_WordsDictionary;
         }
-
 
         /// <summary>
         /// Gets the speech from the file and removes all non verbal content
