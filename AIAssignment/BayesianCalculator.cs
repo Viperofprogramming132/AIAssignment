@@ -35,5 +35,25 @@ namespace AIAssignment
         {
             return (double)(numOfWord + 1) / (totalCategoryWords + totalWords);
         }
+
+        /// <summary>
+        /// Calculates the probability of the document being the category
+        /// </summary>
+        /// <param name="wordProbabilities">List of the common words and there probabilities of occurring between the document and the category</param>
+        /// <param name="categoryProbability">Probability of the category occurring</param>
+        /// <returns>probability of the new document occurring</returns>
+        public static double DocumentProbability(List<Probability> wordProbabilities, double categoryProbability)
+        {
+            double docProbability = wordProbabilities[0].ProbabilityOfOccurrence;
+            wordProbabilities.RemoveAt(0);
+            foreach (Probability probability in wordProbabilities)
+            {
+                docProbability += probability.ProbabilityOfOccurrence;
+            }
+
+            docProbability *= categoryProbability;
+
+            return docProbability;
+        }
     }
 }

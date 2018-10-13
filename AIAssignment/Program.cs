@@ -15,6 +15,7 @@ namespace AIAssignment
     {
         static void Main(string[] args)
         {
+            BayesianManager manager = new BayesianManager();
             char input;
             do
             {
@@ -31,11 +32,11 @@ namespace AIAssignment
                 {
                     case 'a':
                         //TODO: Training
-                        BayesainNetwork b = new BayesainNetwork();
-                        b.StartTraining();
+                        manager.StartTraining();
                         break;
                     case 'b':
                         //TODO: Classification
+                        manager.ClassifyDocument();
                         break;
                     case 'q':
                         //TODO: Exit
@@ -45,7 +46,6 @@ namespace AIAssignment
                         break;
                 }
 
-                Console.ReadKey();
             }
             while (input != 'q');
         }

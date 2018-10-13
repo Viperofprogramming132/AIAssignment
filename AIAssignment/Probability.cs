@@ -16,17 +16,17 @@ namespace AIAssignment
         /// <summary>
         /// The word.
         /// </summary>
-        private readonly string m_Word;
+        private string m_Word;
 
         /// <summary>
         /// The count of occurrences
         /// </summary>
-        private readonly int m_Count;
+        private int m_Count;
 
         /// <summary>
         /// The probability of the word occurring
         /// </summary>
-        private readonly double m_Probability;
+        private double m_Probability;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Probability"/> class.
@@ -47,12 +47,18 @@ namespace AIAssignment
             this.m_Probability = probability;
         }
 
+        public Probability()
+        {
+
+        }
+
         /// <summary>
         /// Gets the word.
         /// </summary>
         public string Word
         {
             get => m_Word;
+            set => this.m_Word = value;
         }
 
         /// <summary>
@@ -61,6 +67,7 @@ namespace AIAssignment
         public int Count
         {
             get => m_Count;
+            set => this.m_Count = value;
         }
 
         /// <summary>
@@ -69,6 +76,7 @@ namespace AIAssignment
         public double ProbabilityOfOccurrence
         {
             get => m_Probability;
+            set => this.m_Probability = value;
         }
 
         /// <summary>
@@ -80,6 +88,11 @@ namespace AIAssignment
         public override string ToString()
         {
             return this.m_Word + ", " + this.m_Count + ", " + this.m_Probability;
+        }
+
+        public void LogirithmProbability()
+        {
+            this.m_Probability = Math.Log10(this.m_Probability);
         }
     }
 }

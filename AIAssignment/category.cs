@@ -17,7 +17,7 @@ namespace AIAssignment
         /// <summary>
         /// Party/Category name
         /// </summary>
-        private readonly string m_CategoryName;
+        private string m_CategoryName;
 
         /// <summary>
         /// Contains all speeches for this party/category
@@ -32,12 +32,12 @@ namespace AIAssignment
         /// <summary>
         /// Contains all the words for all the speeches in the party/category
         /// </summary>
-        private readonly Dictionary<string, int> m_CategoryWordsDictionary = new Dictionary<string, int>();
+        private Dictionary<string, int> m_CategoryWordsDictionary = new Dictionary<string, int>();
 
         /// <summary>
         /// Contains all the words and the counts with the P(word|category)
         /// </summary>
-        private readonly List<Probability> m_WordProbabilities = new List<Probability>();
+        private List<Probability> m_WordProbabilities = new List<Probability>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Category"/> class. 
@@ -47,16 +47,20 @@ namespace AIAssignment
         /// </param>
         public Category(string name)
         {
-            this.m_CategoryName = name;
+            this.CategoryName = name;
+        }
+
+        public Category()
+        {
+
         }
 
         /// <summary>
         /// Gets or sets the category speeches.
         /// </summary>
-        public List<Speech> CategorySpeeches
+        public List<Speech> GetCategorySpeeches()
         {
-            get => this.m_CategorySpeeches;
-            set => this.m_CategorySpeeches = value;
+            return this.m_CategorySpeeches;
         }
 
         /// <summary>
@@ -71,9 +75,9 @@ namespace AIAssignment
         /// <summary>
         /// Gets the category words dictionary.
         /// </summary>
-        public Dictionary<string, int> CategoryWordsDictionary
+        public Dictionary<string, int> GetCategoryWordsDictionary()
         {
-            get => this.m_CategoryWordsDictionary;
+            return this.m_CategoryWordsDictionary;
         }
 
         /// <summary>
@@ -81,7 +85,18 @@ namespace AIAssignment
         /// </summary>
         public List<Probability> WordProbabilities
         {
-            get => m_WordProbabilities;
+            get => this.m_WordProbabilities;
+            set => this.m_WordProbabilities = value;
+        }
+
+        /// <summary>
+        /// Party/Category name
+        /// </summary>
+        public string CategoryName
+        {
+            get => this.m_CategoryName;
+            set => this.m_CategoryName = value;
+            
         }
 
         /// <summary>
@@ -92,7 +107,7 @@ namespace AIAssignment
         /// </returns>
         public override string ToString()
         {
-            return this.m_CategoryName;
+            return this.CategoryName;
         }
 
         /// <summary>
@@ -125,7 +140,7 @@ namespace AIAssignment
         /// </param>
         public void CalculateWordProb(int TotalWords)
         {
-            foreach (KeyValuePair<string, int> pair in CategoryWordsDictionary)
+            foreach (KeyValuePair<string, int> pair in GetCategoryWordsDictionary())
             {
                 this.m_WordProbabilities.Add(
                     new Probability(

@@ -27,7 +27,9 @@ namespace AIAssignment
         /// <summary>
         /// Contains all information about the file
         /// </summary>
-        private readonly FileInfo m_File;
+        private FileInfo m_File;
+
+        private string m_FileName;
 
         /// <summary>
         /// The Speech as it is before any editing
@@ -37,7 +39,7 @@ namespace AIAssignment
         /// <summary>
         /// The words and how often they occur
         /// </summary>
-        readonly Dictionary<string, int> m_WordsDictionary = new Dictionary<string, int>();
+        private readonly Dictionary<string, int> m_WordsDictionary = new Dictionary<string, int>();
 
         /// <summary>
         /// Constructor for the Speech gets all the information from the files
@@ -46,6 +48,15 @@ namespace AIAssignment
         public Speech(FileInfo file)
         {
             this.m_File = file;
+            this.m_FileName = this.m_File.FullName;
+            this.m_Stopwords = File.ReadAllLines(Directory.GetCurrentDirectory() + "\\stopwords.txt");
+            this.GetScript();
+            this.FillDictionary();
+        }
+
+        public Speech()
+        {
+            this.m_File = new FileInfo(this.m_FileName);
             this.m_Stopwords = File.ReadAllLines(Directory.GetCurrentDirectory() + "\\stopwords.txt");
             this.GetScript();
             this.FillDictionary();
@@ -65,6 +76,12 @@ namespace AIAssignment
         public Dictionary<string, int> WordsDictionary
         {
             get => this.m_WordsDictionary;
+        }
+
+        public string FileName
+        {
+            get => this.m_FileName;
+            set => this.m_FileName = value;
         }
 
         /// <summary>
