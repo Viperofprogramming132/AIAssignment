@@ -323,11 +323,14 @@ namespace AIAssignment
             {
                 foreach (Probability probability in category.WordProbabilities)
                 {
-                    probability.LogirithmProbability();
+                    if (probability.ProbabilityOfOccurrence > 0)
+                    {
+                        probability.LogirithmProbability();
+                    }
                 }
             }
 
-            
+
             foreach (Dictionary<Category, List<Probability>> CategoryWordPair in this.m_WordsFoundInCategoryList)
             {
                 foreach (Category category in CategoryWordPair.Keys)
@@ -348,6 +351,8 @@ namespace AIAssignment
                 };
             File.AppendAllLines("results.txt", output);
             Console.ReadKey();
+
+            
         }
 
         #endregion

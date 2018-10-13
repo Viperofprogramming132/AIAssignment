@@ -46,12 +46,13 @@ namespace AIAssignment
         {
             double docProbability = wordProbabilities[0].ProbabilityOfOccurrence;
             wordProbabilities.RemoveAt(0);
+
             foreach (Probability probability in wordProbabilities)
             {
                 docProbability += probability.ProbabilityOfOccurrence;
             }
 
-            docProbability *= categoryProbability;
+            docProbability += Math.Log(categoryProbability);
 
             return docProbability;
         }

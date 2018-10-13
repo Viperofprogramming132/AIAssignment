@@ -92,7 +92,7 @@ namespace AIAssignment
 
         public void LogirithmProbability()
         {
-            this.m_Probability = Math.Log10(this.m_Probability);
+            this.m_Probability = Math.Log(this.m_Probability);
         }
     }
 }
