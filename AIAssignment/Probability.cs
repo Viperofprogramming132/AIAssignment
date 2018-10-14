@@ -89,10 +89,5 @@ namespace AIAssignment
         {
             return this.m_Word + ", " + this.m_Count + ", " + this.m_Probability;
         }
-
-        public void LogirithmProbability()
-        {
-            this.m_Probability = Math.Log(this.m_Probability);
-        }
     }
 }

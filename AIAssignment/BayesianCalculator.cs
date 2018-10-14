@@ -49,7 +49,7 @@ namespace AIAssignment
 
             foreach (Probability probability in wordProbabilities)
             {
-                docProbability += probability.ProbabilityOfOccurrence;
+                docProbability += Math.Log(probability.ProbabilityOfOccurrence);
             }
 
             docProbability += Math.Log(categoryProbability);

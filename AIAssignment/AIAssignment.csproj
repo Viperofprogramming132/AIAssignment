@@ -56,6 +56,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Speech.cs" />
+    <Compile Include="Stemmer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

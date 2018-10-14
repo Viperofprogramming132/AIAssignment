@@ -13,6 +13,7 @@ namespace AIAssignment
 {
     class Program
     {
+
         static void Main(string[] args)
         {
             BayesianManager manager = new BayesianManager();

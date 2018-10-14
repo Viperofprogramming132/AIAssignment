@@ -319,18 +319,6 @@ namespace AIAssignment
 
         private void GetProbabilities()
         {
-            foreach (Category category in this.Categories)
-            {
-                foreach (Probability probability in category.WordProbabilities)
-                {
-                    if (probability.ProbabilityOfOccurrence > 0)
-                    {
-                        probability.LogirithmProbability();
-                    }
-                }
-            }
-
-
             foreach (Dictionary<Category, List<Probability>> CategoryWordPair in this.m_WordsFoundInCategoryList)
             {
                 foreach (Category category in CategoryWordPair.Keys)
@@ -343,7 +331,7 @@ namespace AIAssignment
 
         private void OutputResult()
         {
-            int indexOfLargest = this.m_CategoryProbabilities.Values.ToList().IndexOf(this.m_CategoryProbabilities.Values.Max());
+            int indexOfLargest = this.m_CategoryProbabilities.Values.ToList().IndexOf(this.m_CategoryProbabilities.Values.Min());
             Console.WriteLine("\nThe file " + this.m_ClassifyDocument.FileInf.Name + @" is classified under the " + this.m_CategoryProbabilities.Keys.ToList()[indexOfLargest] + @" category");
             string[] output = 
                 {

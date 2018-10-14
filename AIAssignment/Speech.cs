@@ -17,7 +17,7 @@ namespace AIAssignment
         /// <summary>
         /// Contains all the characters to remove from the speeches
         /// </summary>
-        private static readonly char[] m_NonVerbalContent = { '"', ':', ';', '\n', '\t', '.', ',' };
+        private static readonly char[] m_NonVerbalContent = { '"', ':', ';', '\n', '\t', '.', ',','\r' };
 
         /// <summary>
         /// Contains all the stopwords to remove from the speech
@@ -102,8 +102,15 @@ namespace AIAssignment
                 {
                     if (speech[i] == c)
                     {
-                        speech.RemoveAt(i);
-                        i--;
+                        if (c == '\n')
+                        {
+                            speech[i] = ' ';
+                        }
+                        else
+                        {
+                            speech.RemoveAt(i);
+                            i--;
+                        }
                     }
                 }
             }
@@ -116,20 +123,23 @@ namespace AIAssignment
         /// </summary>
         private void FillDictionary()
         {
+            Stemmer stemmer = new Stemmer();
             string[] words = this.m_SpeechScript.ToLower().Split(' ');
 
             foreach (string word in words)
             {
+                
                 //Checks if the word is not a stopword
                 if (!this.m_Stopwords.Any(x => x == word))
                 {
-                    if (this.m_WordsDictionary.ContainsKey(word))
+                    string StemmedWord = stemmer.StemWord(word);
+                    if (this.m_WordsDictionary.ContainsKey(StemmedWord))
                     {
-                        this.m_WordsDictionary[word]++;
+                        this.m_WordsDictionary[StemmedWord]++;
                     }
                     else
                     {
-                        this.m_WordsDictionary.Add(word, 1);
+                        this.m_WordsDictionary.Add(StemmedWord, 1);
                     }
                 }
             }
