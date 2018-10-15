@@ -140,7 +140,7 @@ namespace AIAssignment
         /// </param>
         public void CalculateWordProb(int TotalWords)
         {
-            foreach (KeyValuePair<string, int> pair in GetCategoryWordsDictionary())
+            foreach (KeyValuePair<string, int> pair in this.m_CategoryWordsDictionary)
             {
                 this.m_WordProbabilities.Add(
                     new Probability(
@@ -150,6 +150,16 @@ namespace AIAssignment
                             pair.Value,
                             this.m_CategoryWordsDictionary.Sum(x => x.Value),
                             TotalWords)));
+            }
+        }
+
+        public void CalculateTFIDF(int totalDocuments, Dictionary<Speech,List<string>> wordsToSpeeches)
+        {
+            foreach (Probability probability in m_WordProbabilities)
+            {
+                //wordsToSpeeches.Count(x => x.Value.Sum(c => c.Equals(probability.Word)));
+                
+                probability.TFIDF(m_CategoryWordsDictionary.Sum(x => x.Value), totalDocuments);
             }
         }
     }

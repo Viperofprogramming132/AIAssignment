@@ -29,6 +29,7 @@ namespace AIAssignment
             {
                 serializer.Serialize(writer, this.m_Network);
             }
+            
         }
 
         private void DeserializeNetwork()

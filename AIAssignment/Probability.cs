@@ -29,6 +29,11 @@ namespace AIAssignment
         private double m_Probability;
 
         /// <summary>
+        /// Term Frequency Inverse Document Frequency
+        /// </summary>
+        private double m_TFIDF;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Probability"/> class.
         /// </summary>
         /// <param name="word">
@@ -47,6 +52,10 @@ namespace AIAssignment
             this.m_Probability = probability;
         }
 
+
+        /// <summary>
+        /// Blank constructor for serialization
+        /// </summary>
         public Probability()
         {
 
@@ -57,7 +66,7 @@ namespace AIAssignment
         /// </summary>
         public string Word
         {
-            get => m_Word;
+            get => this.m_Word;
             set => this.m_Word = value;
         }
 
@@ -66,7 +75,7 @@ namespace AIAssignment
         /// </summary>
         public int Count
         {
-            get => m_Count;
+            get => this.m_Count;
             set => this.m_Count = value;
         }
 
@@ -79,6 +88,12 @@ namespace AIAssignment
             set => this.m_Probability = value;
         }
 
+        public double TermFrequencProbability
+        {
+            get => this.m_TFIDF;
+            set => this.m_TFIDF = value;
+        }
+
         /// <summary>
         /// The word, count, probability laid out as such
         /// </summary>
@@ -88,6 +103,20 @@ namespace AIAssignment
         public override string ToString()
         {
             return this.m_Word + ", " + this.m_Count + ", " + this.m_Probability;
+        }
+
+
+        /// <summary>
+        /// Gernerates the term frequency inverse document frequency
+        /// </summary>
+        /// <param name="totalWords">Total words in the document</param>
+        /// <param name="totalScripts">Total Scripts in corpus</param>
+        public void TFIDF(int totalWords, int totalScripts)
+        {
+            double TFword = (double) m_Count / totalWords;
+            double IF = Math.Log((double)totalScripts / /*number of documents with term inside it*/ 1);
+
+            this.m_TFIDF = TFword / IF;
         }
     }
 }

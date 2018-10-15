@@ -88,6 +88,7 @@ namespace AIAssignment
             this.GetTrainingData();
             this.SetCategories();
             this.CalculateCategoryProbabilities();
+            this.CalculateWeightedProbabilities();
         }
 
         /// <summary>
@@ -226,6 +227,30 @@ namespace AIAssignment
             }
         }
 
+
+        private void CalculateWeightedProbabilities()
+        {
+            int totalDocuments = 0;
+            Dictionary<Speech, List<string>> wordsToSpeeches = new Dictionary<Speech, List<string>>();
+            foreach(Category category in m_Categories)
+            {
+                totalDocuments += category.GetCategorySpeeches().Count;
+                foreach(Speech speech in category.GetCategorySpeeches())
+                {
+                    List<string> containedWords = new List<string>();
+                    foreach (KeyValuePair<string,int> words in speech.WordsDictionary)
+                    {
+                        containedWords.Add(words.Key);
+                    }
+                    wordsToSpeeches.Add(speech, containedWords);
+                }
+            }
+
+            foreach (Category category in m_Categories)
+            {
+                category.CalculateTFIDF(totalDocuments, wordsToSpeeches);
+            }
+        }
         #endregion
 
         #region Classify

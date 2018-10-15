@@ -44,7 +44,7 @@ namespace AIAssignment
         /// <returns>probability of the new document occurring</returns>
         public static double DocumentProbability(List<Probability> wordProbabilities, double categoryProbability)
         {
-            double docProbability = wordProbabilities[0].ProbabilityOfOccurrence;
+            double docProbability = Math.Log(wordProbabilities[0].ProbabilityOfOccurrence);
             wordProbabilities.RemoveAt(0);
 
             foreach (Probability probability in wordProbabilities)
