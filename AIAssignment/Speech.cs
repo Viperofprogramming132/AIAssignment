@@ -1,7 +1,7 @@
 ﻿// Project: AIAssignment
 // Filename; Speech.cs
 // Created; 10/10/2018
-// Edited: 11/10/2018
+// Edited: 16/10/2018
 
 using System;
 using System.Collections.Generic;
@@ -10,14 +10,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace AIAssignment
+namespace AIAssignment.Network
 {
     public class Speech
     {
         /// <summary>
         /// Contains all the characters to remove from the speeches
         /// </summary>
-        private static readonly char[] m_NonVerbalContent = { '"', ':', ';', '\n', '\t', '.', ',','\r' };
+        private static readonly char[] m_NonVerbalContent = { '"', ':', ';', '\n', '\t', '.', ',', '\r' };
 
         /// <summary>
         /// Contains all the stopwords to remove from the speech
@@ -27,9 +27,7 @@ namespace AIAssignment
         /// <summary>
         /// Contains all information about the file
         /// </summary>
-        private FileInfo m_File;
-
-        private string m_FileName;
+        private readonly FileInfo m_File;
 
         /// <summary>
         /// The Speech as it is before any editing
@@ -48,15 +46,18 @@ namespace AIAssignment
         public Speech(FileInfo file)
         {
             this.m_File = file;
-            this.m_FileName = this.m_File.FullName;
+            this.FileName = this.m_File.FullName;
             this.m_Stopwords = File.ReadAllLines(Directory.GetCurrentDirectory() + "\\stopwords.txt");
             this.GetScript();
             this.FillDictionary();
         }
 
+        /// <summary>
+        /// Empty constructor for serialization 
+        /// </summary>
         public Speech()
         {
-            this.m_File = new FileInfo(this.m_FileName);
+            this.m_File = new FileInfo(this.FileName);
             this.m_Stopwords = File.ReadAllLines(Directory.GetCurrentDirectory() + "\\stopwords.txt");
             this.GetScript();
             this.FillDictionary();
@@ -78,11 +79,7 @@ namespace AIAssignment
             get => this.m_WordsDictionary;
         }
 
-        public string FileName
-        {
-            get => this.m_FileName;
-            set => this.m_FileName = value;
-        }
+        public string FileName { get; set; }
 
         /// <summary>
         /// Gets the speech from the file and removes all non verbal content
@@ -128,18 +125,17 @@ namespace AIAssignment
 
             foreach (string word in words)
             {
-                
                 //Checks if the word is not a stopword
                 if (!this.m_Stopwords.Any(x => x == word))
                 {
-                    string StemmedWord = stemmer.StemWord(word);
-                    if (this.m_WordsDictionary.ContainsKey(StemmedWord))
+                    string stemmedWord = stemmer.StemWord(word);
+                    if (this.m_WordsDictionary.ContainsKey(stemmedWord))
                     {
-                        this.m_WordsDictionary[StemmedWord]++;
+                        this.m_WordsDictionary[stemmedWord]++;
                     }
                     else
                     {
-                        this.m_WordsDictionary.Add(StemmedWord, 1);
+                        this.m_WordsDictionary.Add(stemmedWord, 1);
                     }
                 }
             }

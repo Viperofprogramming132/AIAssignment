@@ -1,10 +1,12 @@
-﻿using System;
+﻿// Project: AIAssignment
+// Filename; Stemmer.cs
+// Created; 14/10/2018
+// Edited: 16/10/2018
+
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace AIAssignment
+namespace AIAssignment.Network
 {
     /// <summary>
     /// Reduces the words down to the simplest form (makes words not proper words though)
@@ -17,10 +19,7 @@ namespace AIAssignment
         /// https://stackoverflow.com/questions/314466/generating-an-array-of-letters-in-the-alphabet
         /// </summary>
         private readonly char[] m_Alphabet =
-            Enumerable.Range('a', 'z' - 'a' + 1)
-            .Select(c => (char)c)
-            .Concat(new[] { '\'' }).ToArray();
-
+            Enumerable.Range('a', 'z' - 'a' + 1).Select(c => (char)c).Concat(new[] { '\'' }).ToArray();
 
         /// <summary>
         /// Char array for the vowels of the alphabet
@@ -101,7 +100,7 @@ namespace AIAssignment
             word = this.RemoveSSuffix(word);
             word = this.RemoveOtherSSuffix(word);
             word = this.RemoveLySuffix(word, r1);
-            word = this.ReplaceYwithIWhereFollowingConsonant(word);
+            word = this.ReplaceYWithIWhereFollowingConsonant(word);
             word = this.ReplaceSuffixes(word, r1);
             word = this.ReplaceAdditionalSuffixes(word, r1, r2);
             word = this.RemoveSuffixesInR2(word, r2);
@@ -110,6 +109,12 @@ namespace AIAssignment
             return word;
         }
 
+        /// <summary>
+        /// Finds the first vowel after the given beginning that is followed by a consonant
+        /// </summary>
+        /// <param name="word">The word to search</param>
+        /// <param name="begin">Where in the word to start 0 = start 1 = second char and so on</param>
+        /// <returns>The position after the consonant which has a vowel as its predecessor or the word length</returns>
         private int GetRegion(string word, int begin)
         {
             bool vowel = false;
@@ -131,11 +136,21 @@ namespace AIAssignment
             return word.Length;
         }
 
+        /// <summary>
+        /// Checks if the word is short
+        /// </summary>
+        /// <param name="word">The word to test</param>
+        /// <returns>True if short word otherwise false</returns>
         private bool IsShortWord(string word)
         {
             return this.EndsInShortSyllable(word) && this.GetRegion(word, 0) == word.Length;
         }
 
+        /// <summary>
+        /// checks if the end goes Vowel followed by Consonant
+        /// </summary>
+        /// <param name="word">The word to check</param>
+        /// <returns>True if it ends in Vowel Consonant false otherwise</returns>
         private bool EndsInShortSyllable(string word)
         {
             if (word.Length < 2)
@@ -149,10 +164,19 @@ namespace AIAssignment
                 return this.IsVowel(word[0]) && this.IsConsonant(word[1]);
             }
 
-            return this.IsVowel(word[word.Length - 2])
-                   && this.IsConsonant(word[word.Length - 1])
-                   && this.IsConsonant(word[word.Length - 3]);
+            //Consonant followed by Vowel followed by Consonant
+            return this.IsVowel(word[word.Length - 2]) && this.IsConsonant(word[word.Length - 1])
+                                                       && this.IsConsonant(word[word.Length - 3]);
         }
+
+        /// <summary>
+        /// Try and replace the old suffix contained within the word with the new suffix
+        /// </summary>
+        /// <param name="word">The word to change</param>
+        /// <param name="oldSuffix">The old suffix to change</param>
+        /// <param name="newSuffix">The suffix to change it to</param>
+        /// <param name="final">the output word after change</param>
+        /// <returns>True if the word contains the suffix otherwise false</returns>
         private bool TryReplace(string word, string oldSuffix, string newSuffix, out string final)
         {
             if (word.Contains(oldSuffix))
@@ -160,10 +184,18 @@ namespace AIAssignment
                 final = this.ReplaceSuffix(word, oldSuffix, newSuffix);
                 return true;
             }
+
             final = word;
             return false;
         }
 
+        /// <summary>
+        /// Replaces the old suffix with the new suffix default null
+        /// </summary>
+        /// <param name="word">the word to change</param>
+        /// <param name="oldSuffix">The old suffix to change</param>
+        /// <param name="newSuffix">The new suffix to change it to default is nothing</param>
+        /// <returns>The word after change</returns>
         private string ReplaceSuffix(string word, string oldSuffix, string newSuffix = null)
         {
             if (oldSuffix != null)
@@ -175,9 +207,15 @@ namespace AIAssignment
             {
                 word += newSuffix;
             }
+
             return word;
         }
 
+        /// <summary>
+        /// Step 1: Removes the possible S suffixes from the word
+        /// </summary>
+        /// <param name="word">The word to remove the suffixes</param>
+        /// <returns>The word after removing of the suffix</returns>
         private string RemoveSSuffix(string word)
         {
             string[] plurals = { "'s", "s", "s'" };
@@ -192,11 +230,16 @@ namespace AIAssignment
             return word;
         }
 
+        /// <summary>
+        /// Step 2: Removes the other possible S suffixes
+        /// </summary>
+        /// <param name="word">The word to remove the suffix</param>
+        /// <returns>The word after removing the suffix</returns>
         private string RemoveOtherSSuffix(string word)
         {
             if (word.EndsWith("sses"))
             {
-                return ReplaceSuffix(word, "sses", "ss");
+                return this.ReplaceSuffix(word, "sses", "ss");
             }
 
             if (word.EndsWith("ied") || word.EndsWith("ies"))
@@ -209,10 +252,12 @@ namespace AIAssignment
 
                 return wordWithoutEnd + "ie";
             }
+
             if (word.EndsWith("us") || word.EndsWith("ss"))
             {
                 return word;
             }
+
             if (word.EndsWith("s"))
             {
                 if (word.Length < 3)
@@ -233,6 +278,12 @@ namespace AIAssignment
             return word;
         }
 
+        /// <summary>
+        /// Step 3: Remove suffixes mainly containing e and ly
+        /// </summary>
+        /// <param name="word">The word to remove the suffixes from</param>
+        /// <param name="r1">Where region 1 starts (from the get region function)</param>
+        /// <returns>The word after removing the suffix</returns>
         private string RemoveLySuffix(string word, int r1)
         {
             string[] endingString1 = { "eedly", "eed" };
@@ -242,6 +293,7 @@ namespace AIAssignment
                 {
                     return this.ReplaceSuffix(word, suffix, "ee");
                 }
+
                 return word;
             }
 
@@ -256,84 +308,98 @@ namespace AIAssignment
                     {
                         return trunc + "e";
                     }
+
                     if (this.m_Doubles.Any(trunc.EndsWith))
                     {
                         return trunc.Substring(0, trunc.Length - 1);
                     }
+
                     if (this.IsShortWord(trunc))
                     {
                         return trunc + "e";
                     }
+
                     return trunc;
                 }
+
                 return word;
             }
 
             return word;
         }
 
-        private string ReplaceYwithIWhereFollowingConsonant(string word)
+        /// <summary>
+        /// Step 4: Replaces Y with I
+        /// </summary>
+        /// <param name="word">The word to change</param>
+        /// <returns>The word after changing Y with I</returns>
+        private string ReplaceYWithIWhereFollowingConsonant(string word)
         {
-            if (word.EndsWith("y")
-                && word.Length > 2
-                && IsConsonant(word[word.Length - 2]))
+            if (word.EndsWith("y") && word.Length > 2 && this.IsConsonant(word[word.Length - 2]))
             {
                 return word.Substring(0, word.Length - 1) + "i";
             }
+
             return word;
         }
 
+        /// <summary>
+        /// Step 5: Removes the suffixes found within the dictionary
+        /// </summary>
+        /// <param name="word">The word to remove the suffixes from</param>
+        /// <param name="r1">Where region 1 starts (from the get region function)</param>
+        /// <returns>The word after removing the suffix</returns>
         private string ReplaceSuffixes(string word, int r1)
         {
             Dictionary<string, string> suffixes = new Dictionary<string, string>()
-                {
-                    { "ization", "ize" },
-                    { "ational", "ate" },
-                    { "ousness", "ous" },
-                    { "iveness", "ive" },
-                    { "fulness", "ful" },
-                    { "tional", "tion" },
-                    { "lessli", "less" },
-                    { "biliti", "ble" },
-                    { "entli", "ent" },
-                    { "ation", "ate" },
-                    { "alism", "al" },
-                    { "aliti", "al" },
-                    { "fulli", "ful" },
-                    { "ousli", "ous" },
-                    { "iviti", "ive" },
-                    { "enci", "ence" },
-                    { "anci", "ance" },
-                    { "abli", "able" },
-                    { "izer", "ize" },
-                    { "ator", "ate" },
-                    { "alli", "al" },
-                    { "bli", "ble" }
-                };
+                                                      {
+                                                          { "ization", "ize" },
+                                                          { "ational", "ate" },
+                                                          { "ousness", "ous" },
+                                                          { "iveness", "ive" },
+                                                          { "fulness", "ful" },
+                                                          { "tional", "tion" },
+                                                          { "lessli", "less" },
+                                                          { "biliti", "ble" },
+                                                          { "entli", "ent" },
+                                                          { "ation", "ate" },
+                                                          { "alism", "al" },
+                                                          { "aliti", "al" },
+                                                          { "fulli", "ful" },
+                                                          { "ousli", "ous" },
+                                                          { "iviti", "ive" },
+                                                          { "enci", "ence" },
+                                                          { "anci", "ance" },
+                                                          { "abli", "able" },
+                                                          { "izer", "ize" },
+                                                          { "ator", "ate" },
+                                                          { "alli", "al" },
+                                                          { "bli", "ble" }
+                                                      };
 
-            foreach (KeyValuePair<string,string> suffix in suffixes)
+            foreach (KeyValuePair<string, string> suffix in suffixes)
             {
                 if (word.EndsWith(suffix.Key))
                 {
-                    string final;
-                    if (SuffixInR1(word, r1, suffix.Key)
-                        && TryReplace(word, suffix.Key, suffix.Value, out final))
+                    if (this.SuffixInR1(word, r1, suffix.Key) && this.TryReplace(
+                            word,
+                            suffix.Key,
+                            suffix.Value,
+                            out string final))
                     {
                         return final;
                     }
+
                     return word;
                 }
             }
 
-
-            if (word.EndsWith("ogi")
-                && SuffixInR1(word, r1, "ogi")
-                && word[word.Length - 4] == 'l')
+            if (word.EndsWith("ogi") && this.SuffixInR1(word, r1, "ogi") && word[word.Length - 4] == 'l')
             {
                 return this.ReplaceSuffix(word, "ogi", "og");
             }
 
-            if (word.EndsWith("li") & SuffixInR1(word, r1, "li"))
+            if (word.EndsWith("li") & this.SuffixInR1(word, r1, "li"))
             {
                 if (this.m_LiEndings.Contains(word[word.Length - 3]))
                 {
@@ -342,28 +408,37 @@ namespace AIAssignment
             }
 
             return word;
-
         }
 
+        /// <summary>
+        /// Step 6: Replaces the other suffixes contained within the dictionary as well as "ative"
+        /// </summary>
+        /// <param name="word">The word to remove the suffixes form</param>
+        /// <param name="r1">Region 1 start of the word</param>
+        /// <param name="r2">Region 2 end of region 1 to the end of the word</param>
+        /// <returns>The word after removing the suffix</returns>
         private string ReplaceAdditionalSuffixes(string word, int r1, int r2)
         {
-            Dictionary<string, string> suffixes = new Dictionary<string, string>
-                {
-                    {"ational", "ate"},
-                    {"tional", "tion"},
-                    {"alize", "al"},
-                    {"icate", "ic"},
-                    {"iciti", "ic"},
-                    {"ical", "ic"},
-                    {"ful", null},
-                    {"ness", null}
-                };
+            Dictionary<string, string> suffixes =
+                new Dictionary<string, string>
+                    {
+                        { "ational", "ate" },
+                        { "tional", "tion" },
+                        { "alize", "al" },
+                        { "icate", "ic" },
+                        { "iciti", "ic" },
+                        { "ical", "ic" },
+                        { "ful", null },
+                        { "ness", null }
+                    };
 
-            foreach (KeyValuePair<string,string> suffix in suffixes.Where(s => word.EndsWith(s.Key)))
+            foreach (KeyValuePair<string, string> suffix in suffixes.Where(s => word.EndsWith(s.Key)))
             {
-                string final;
-                if (this.SuffixInR1(word, r1, suffix.Key)
-                    && TryReplace(word, suffix.Key, suffix.Value, out final))
+                if (this.SuffixInR1(word, r1, suffix.Key) && this.TryReplace(
+                        word,
+                        suffix.Key,
+                        suffix.Value,
+                        out string final))
                 {
                     return final;
                 }
@@ -373,13 +448,19 @@ namespace AIAssignment
             {
                 if (this.SuffixInR1(word, r1, "ative") && this.SuffixInR2(word, r2, "ative"))
                 {
-                    return this.ReplaceSuffix(word, "ative", null);
+                    return this.ReplaceSuffix(word, "ative");
                 }
             }
 
             return word;
         }
 
+        /// <summary>
+        /// Step 7: Removes the ending suffixes like able and er
+        /// </summary>
+        /// <param name="word">The word to remove the suffixes</param>
+        /// <param name="r2">Region 2 is the rest of the word after region 1</param>
+        /// <returns>The word after removing the suffix</returns>
         private string RemoveSuffixesInR2(string word, int r2)
         {
             string[] suffixes =
@@ -395,33 +476,37 @@ namespace AIAssignment
                     {
                         return this.ReplaceSuffix(word, suffix);
                     }
+
                     return word;
                 }
             }
 
-            if (word.EndsWith("ion") &&
-                this.SuffixInR2(word, r2, "ion") &&
-                new[] { 's', 't' }.Contains(word[word.Length - 4]))
+            if (word.EndsWith("ion") && this.SuffixInR2(word, r2, "ion")
+                                     && new[] { 's', 't' }.Contains(word[word.Length - 4]))
             {
                 return this.ReplaceSuffix(word, "ion");
             }
+
             return word;
         }
 
+        /// <summary>
+        /// Step 8: Removes E and L suffixes
+        /// </summary>
+        /// <param name="word">Word to remove the suffix from</param>
+        /// <param name="r1">The start of the word</param>
+        /// <param name="r2">The rest of the word after region 1</param>
+        /// <returns>The word after removing the suffix</returns>
         private string RemoveEorLSuffixes(string word, int r1, int r2)
         {
-            if (word.EndsWith("e") &&
-                (this.SuffixInR2(word, r2, "e") ||
-                 (this.SuffixInR1(word, r1, "e") &&
-                  !EndsInShortSyllable(this.ReplaceSuffix(word, "e")))))
+            if (word.EndsWith("e") && (this.SuffixInR2(word, r2, "e")
+                                       || (this.SuffixInR1(word, r1, "e")
+                                           && !this.EndsInShortSyllable(this.ReplaceSuffix(word, "e")))))
             {
                 return this.ReplaceSuffix(word, "e");
             }
 
-            if (word.EndsWith("l") &&
-                this.SuffixInR2(word, r2, "l") &&
-                word.Length > 1 &&
-                word[word.Length - 2] == 'l')
+            if (word.EndsWith("l") && this.SuffixInR2(word, r2, "l") && word.Length > 1 && word[word.Length - 2] == 'l')
             {
                 return this.ReplaceSuffix(word, "l");
             }

@@ -1,7 +1,7 @@
 ﻿// Project: AIAssignment
 // Filename; BayesianCalculator.cs
 // Created; 10/10/2018
-// Edited: 11/10/2018
+// Edited: 16/10/2018
 
 using System;
 using System.Collections.Generic;
@@ -9,8 +9,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AIAssignment
+namespace AIAssignment.Network
 {
+    /// <summary>
+    /// Calculator that does all the mathematics for the bayesain probability
+    /// </summary>
     public static class BayesianCalculator
     {
         /// <summary>
@@ -44,12 +47,12 @@ namespace AIAssignment
         /// <returns>probability of the new document occurring</returns>
         public static double DocumentProbability(List<Probability> wordProbabilities, double categoryProbability)
         {
-            double docProbability = Math.Log(wordProbabilities[0].ProbabilityOfOccurrence);
+            double docProbability = Math.Log(wordProbabilities[0].TermFrequencyProbability);
             wordProbabilities.RemoveAt(0);
 
             foreach (Probability probability in wordProbabilities)
             {
-                docProbability += Math.Log(probability.ProbabilityOfOccurrence);
+                docProbability += Math.Log(probability.TermFrequencyProbability);
             }
 
             docProbability += Math.Log(categoryProbability);

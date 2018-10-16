@@ -1,7 +1,7 @@
 ﻿// Project: AIAssignment
 // Filename; BayesainNetwork.cs
 // Created; 10/10/2018
-// Edited: 11/10/2018
+// Edited: 16/10/2018
 
 using System;
 using System.Collections.Generic;
@@ -10,9 +10,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace AIAssignment
+namespace AIAssignment.Network
 {
-
+    /// <summary>
+    /// Main control for the Bayesian Network
+    /// </summary>
     public class BayesainNetwork
     {
         /// <summary>
@@ -38,7 +40,8 @@ namespace AIAssignment
         /// <summary>
         /// The list of a list of probabilities that the words are found in both the category and the document to classify
         /// </summary>
-        private List<Dictionary<Category,List<Probability>>> m_WordsFoundInCategoryList = new List<Dictionary<Category, List<Probability>>>();
+        private List<Dictionary<Category, List<Probability>>> m_WordsFoundInCategoryList =
+            new List<Dictionary<Category, List<Probability>>>();
 
         /// <summary>
         /// The dictionary containing the category that the document was compared against with the probability of it being that category
@@ -50,14 +53,8 @@ namespace AIAssignment
         /// </summary>
         public List<Category> Categories
         {
-            get
-            {
-                return this.m_Categories;
-            }
-            set
-            {
-                this.m_Categories = value;
-            }
+            get => this.m_Categories;
+            set => this.m_Categories = value;
         }
 
         private FileInfo[] GetFilesInLocation(string workingDirectory)
@@ -106,23 +103,31 @@ namespace AIAssignment
                 bool badInput = false;
                 retry = false;
 
-                Console.WriteLine(@"Please select which files you wish to use (Separate selection number with a comma ',').");
+                Console.WriteLine(
+                    @"Please select which files you wish to use (Separate selection number with a comma ',').");
 
                 string input = Console.ReadLine();
 
-                string[] selections = input.Split(',');
-
-                foreach (string selection in selections)
+                //Ensure the string is not empty
+                if (input != string.Empty)
                 {
-                    //Make sure they only input numbers between the commas
-                    try
+                    string[] selections = input.Split(',');
+                    foreach (string selection in selections)
                     {
-                        this.m_TrainingDataFiles.Add(new Speech(possibleTrainingFiles[int.Parse(selection) - 1]));
+                        //Make sure they only input numbers between the commas
+                        try
+                        {
+                            this.m_TrainingDataFiles.Add(new Speech(possibleTrainingFiles[int.Parse(selection) - 1]));
+                        }
+                        catch
+                        {
+                            badInput = true;
+                        }
                     }
-                    catch
-                    {
-                        badInput = true;
-                    }
+                }
+                else
+                {
+                    badInput = true;
                 }
 
                 //Write out selected files
@@ -227,40 +232,47 @@ namespace AIAssignment
             }
         }
 
-
+        /// <summary>
+        /// Calculates the term frequency inverse document frequency foreach of the words in every category
+        /// </summary>
         private void CalculateWeightedProbabilities()
         {
             int totalDocuments = 0;
             Dictionary<Speech, List<string>> wordsToSpeeches = new Dictionary<Speech, List<string>>();
-            foreach(Category category in m_Categories)
+            foreach (Category category in this.m_Categories)
             {
                 totalDocuments += category.GetCategorySpeeches().Count;
-                foreach(Speech speech in category.GetCategorySpeeches())
+                foreach (Speech speech in category.GetCategorySpeeches())
                 {
                     List<string> containedWords = new List<string>();
-                    foreach (KeyValuePair<string,int> words in speech.WordsDictionary)
+                    foreach (KeyValuePair<string, int> words in speech.WordsDictionary)
                     {
                         containedWords.Add(words.Key);
                     }
+
                     wordsToSpeeches.Add(speech, containedWords);
                 }
             }
 
-            foreach (Category category in m_Categories)
+            foreach (Category category in this.m_Categories)
             {
                 category.CalculateTFIDF(totalDocuments, wordsToSpeeches);
             }
         }
+
         #endregion
 
         #region Classify
 
+        /// <summary>
+        /// Starts the classification of an unknown document
+        /// </summary>
         public void ClassifyDocument()
         {
             //Ensure nothing is taken from the last classification
-            m_WordsFoundInCategoryList = new List<Dictionary<Category, List<Probability>>>();
-            m_CategoryProbabilities = new Dictionary<Category, double>();
-            m_ClassifyDocument = null;
+            this.m_WordsFoundInCategoryList = new List<Dictionary<Category, List<Probability>>>();
+            this.m_CategoryProbabilities = new Dictionary<Category, double>();
+            this.m_ClassifyDocument = null;
 
             this.SelectDocument();
             this.FindExistingWords();
@@ -268,6 +280,10 @@ namespace AIAssignment
             this.OutputResult();
         }
 
+
+        /// <summary>
+        /// Gets the documents from the test folder and asks the user which one they wish to use
+        /// </summary>
         private void SelectDocument()
         {
             FileInfo[] possibleTestFiles = this.GetFilesInLocation(Directory.GetCurrentDirectory() + "\\test");
@@ -286,7 +302,7 @@ namespace AIAssignment
                 //ensures the input was good
                 try
                 {
-                     this.m_ClassifyDocument = new Speech(possibleTestFiles[int.Parse(input) - 1]);
+                    this.m_ClassifyDocument = new Speech(possibleTestFiles[int.Parse(input) - 1]);
                 }
                 catch
                 {
@@ -317,20 +333,22 @@ namespace AIAssignment
             while (retry);
         }
 
+        /// <summary>
+        /// Finds all the common words between the categories and the document to classify
+        /// </summary>
         private void FindExistingWords()
         {
-            
             for (int index = 0; index < this.Categories.Count; index++)
             {
-                Category cate = this.Categories[index];
+                Category category = this.Categories[index];
 
                 this.m_WordsFoundInCategoryList.Add(new Dictionary<Category, List<Probability>>());
 
                 List<Probability> commonWordList = new List<Probability>();
 
-                foreach (KeyValuePair<string,int> wordPair in this.m_ClassifyDocument.WordsDictionary)
+                foreach (KeyValuePair<string, int> wordPair in this.m_ClassifyDocument.WordsDictionary)
                 {
-                    foreach (Probability cateWord in cate.WordProbabilities)
+                    foreach (Probability cateWord in category.WordProbabilities)
                     {
                         if (wordPair.Key == cateWord.Word)
                         {
@@ -338,34 +356,44 @@ namespace AIAssignment
                         }
                     }
                 }
-                this.m_WordsFoundInCategoryList[index].Add(cate, commonWordList);
+
+                this.m_WordsFoundInCategoryList[index].Add(category, commonWordList);
             }
         }
 
+        /// <summary>
+        /// Calculates the probability of the document being in each category
+        /// </summary>
         private void GetProbabilities()
         {
-            foreach (Dictionary<Category, List<Probability>> CategoryWordPair in this.m_WordsFoundInCategoryList)
+            foreach (Dictionary<Category, List<Probability>> categoryWordPair in this.m_WordsFoundInCategoryList)
             {
-                foreach (Category category in CategoryWordPair.Keys)
+                foreach (Category category in categoryWordPair.Keys)
                 {
-                    this.m_CategoryProbabilities.Add(category, BayesianCalculator.DocumentProbability(CategoryWordPair[category], category.Probability));
+                    this.m_CategoryProbabilities.Add(
+                        category,
+                        BayesianCalculator.DocumentProbability(categoryWordPair[category], category.Probability));
                 }
-                
             }
         }
 
+        /// <summary>
+        /// Outputs the result to the console and to results.txt for easy access
+        /// </summary>
         private void OutputResult()
         {
-            int indexOfLargest = this.m_CategoryProbabilities.Values.ToList().IndexOf(this.m_CategoryProbabilities.Values.Min());
-            Console.WriteLine("\nThe file " + this.m_ClassifyDocument.FileInf.Name + @" is classified under the " + this.m_CategoryProbabilities.Keys.ToList()[indexOfLargest] + @" category");
-            string[] output = 
+            int indexOfLargest = this.m_CategoryProbabilities.Values.ToList()
+                .IndexOf(this.m_CategoryProbabilities.Values.Min());
+            Console.WriteLine(
+                "\nThe file " + this.m_ClassifyDocument.FileInf.Name + @" is classified under the "
+                + this.m_CategoryProbabilities.Keys.ToList()[indexOfLargest] + @" category");
+            string[] output =
                 {
-                    "\nThe file " + this.m_ClassifyDocument.FileInf.Name + @" is classified under the " + this.m_CategoryProbabilities.Keys.ToList()[indexOfLargest] + @" category"
+                    "\nThe file " + this.m_ClassifyDocument.FileInf.Name + @" is classified under the "
+                    + this.m_CategoryProbabilities.Keys.ToList()[indexOfLargest] + @" category"
                 };
             File.AppendAllLines("results.txt", output);
             Console.ReadKey();
-
-            
         }
 
         #endregion

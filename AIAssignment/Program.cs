@@ -1,7 +1,7 @@
 ﻿// Project: AIAssignment
 // Filename; Program.cs
 // Created; 10/10/2018
-// Edited: 11/10/2018
+// Edited: 16/10/2018
 
 using System;
 using System.Collections.Generic;
@@ -13,7 +13,6 @@ namespace AIAssignment
 {
     class Program
     {
-
         static void Main(string[] args)
         {
             BayesianManager manager = new BayesianManager();
@@ -21,32 +20,28 @@ namespace AIAssignment
             do
             {
                 Console.Clear();
-                Console.WriteLine("Please Select an Option:\n");
-                Console.WriteLine("A) Undertake training");
-                Console.WriteLine("B) Undertake Classification");
-                Console.WriteLine("Q) Exit");
+                Console.WriteLine(@"Please Select an Option:\n");
+                Console.WriteLine(@"1) Undertake training");
+                Console.WriteLine(@"2) Undertake Classification");
+                Console.WriteLine(@"Q) Exit");
 
                 char.TryParse(Console.ReadLine(), out input);
 
-                input = Char.ToLower(input);
+                input = char.ToLower(input);
                 switch (input)
                 {
-                    case 'a':
-                        //TODO: Training
+                    case '1':
                         manager.StartTraining();
                         break;
-                    case 'b':
-                        //TODO: Classification
+                    case '2':
                         manager.ClassifyDocument();
                         break;
                     case 'q':
-                        //TODO: Exit
                         break;
                     default:
                         Console.WriteLine("Please only input A, B or Q to exit (not case sensitive).");
                         break;
                 }
-
             }
             while (input != 'q');
         }

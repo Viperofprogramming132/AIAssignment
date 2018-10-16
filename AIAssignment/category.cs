@@ -1,7 +1,7 @@
 ﻿// Project: AIAssignment
 // Filename; Category.cs
 // Created; 10/10/2018
-// Edited: 11/10/2018
+// Edited: 16/10/2018
 
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace AIAssignment
+namespace AIAssignment.Network
 {
     public class Category
     {
@@ -22,7 +22,7 @@ namespace AIAssignment
         /// <summary>
         /// Contains all speeches for this party/category
         /// </summary>
-        private List<Speech> m_CategorySpeeches = new List<Speech>();
+        private readonly List<Speech> m_CategorySpeeches = new List<Speech>();
 
         /// <summary>
         /// Probability of the speech being this party/category
@@ -32,7 +32,7 @@ namespace AIAssignment
         /// <summary>
         /// Contains all the words for all the speeches in the party/category
         /// </summary>
-        private Dictionary<string, int> m_CategoryWordsDictionary = new Dictionary<string, int>();
+        private readonly Dictionary<string, int> m_CategoryWordsDictionary = new Dictionary<string, int>();
 
         /// <summary>
         /// Contains all the words and the counts with the P(word|category)
@@ -47,12 +47,11 @@ namespace AIAssignment
         /// </param>
         public Category(string name)
         {
-            this.CategoryName = name;
+            this.m_CategoryName = name;
         }
 
         public Category()
         {
-
         }
 
         /// <summary>
@@ -68,8 +67,8 @@ namespace AIAssignment
         /// </summary>
         public double Probability
         {
-            get => m_Probability;
-            set => m_Probability = value;
+            get => this.m_Probability;
+            set => this.m_Probability = value;
         }
 
         /// <summary>
@@ -96,7 +95,6 @@ namespace AIAssignment
         {
             get => this.m_CategoryName;
             set => this.m_CategoryName = value;
-            
         }
 
         /// <summary>
@@ -107,7 +105,7 @@ namespace AIAssignment
         /// </returns>
         public override string ToString()
         {
-            return this.CategoryName;
+            return this.m_CategoryName;
         }
 
         /// <summary>
@@ -153,13 +151,33 @@ namespace AIAssignment
             }
         }
 
-        public void CalculateTFIDF(int totalDocuments, Dictionary<Speech,List<string>> wordsToSpeeches)
+        /// <summary>
+        /// Calculates the term frequency inverse document frequency foreach word
+        /// </summary>
+        /// <param name="totalDocuments"></param>
+        /// <param name="wordsToSpeeches"></param>
+        public void CalculateTFIDF(int totalDocuments, Dictionary<Speech, List<string>> wordsToSpeeches)
         {
-            foreach (Probability probability in m_WordProbabilities)
+            foreach (Probability probability in this.m_WordProbabilities)
             {
-                //wordsToSpeeches.Count(x => x.Value.Sum(c => c.Equals(probability.Word)));
-                
-                probability.TFIDF(m_CategoryWordsDictionary.Sum(x => x.Value), totalDocuments);
+                //Calculate the scripts contain the word
+                int scriptsContainingWord = 0;
+                foreach (KeyValuePair<Speech, List<string>> wordsToSpeechPair in wordsToSpeeches)
+                {
+                    foreach (string word in wordsToSpeechPair.Value)
+                    {
+                        if (word == probability.Word)
+                        {
+                            scriptsContainingWord++;
+                            break;
+                        }
+                    }
+                }
+
+                probability.CalculateTFIDF(
+                    this.m_CategoryWordsDictionary.Sum(x => x.Value),
+                    totalDocuments,
+                    scriptsContainingWord);
             }
         }
     }

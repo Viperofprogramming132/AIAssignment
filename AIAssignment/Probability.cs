@@ -1,7 +1,7 @@
 ﻿// Project: AIAssignment
 // Filename; Probability.cs
 // Created; 10/10/2018
-// Edited: 11/10/2018
+// Edited: 16/10/2018
 
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AIAssignment
+namespace AIAssignment.Network
 {
     public class Probability
     {
@@ -52,13 +52,11 @@ namespace AIAssignment
             this.m_Probability = probability;
         }
 
-
         /// <summary>
         /// Blank constructor for serialization
         /// </summary>
         public Probability()
         {
-
         }
 
         /// <summary>
@@ -84,11 +82,14 @@ namespace AIAssignment
         /// </summary>
         public double ProbabilityOfOccurrence
         {
-            get => m_Probability;
+            get => this.m_Probability;
             set => this.m_Probability = value;
         }
 
-        public double TermFrequencProbability
+        /// <summary>
+        /// Probability based off the frequency the word is used therefore more common words have less effect
+        /// </summary>
+        public double TermFrequencyProbability
         {
             get => this.m_TFIDF;
             set => this.m_TFIDF = value;
@@ -105,18 +106,25 @@ namespace AIAssignment
             return this.m_Word + ", " + this.m_Count + ", " + this.m_Probability;
         }
 
-
         /// <summary>
-        /// Gernerates the term frequency inverse document frequency
+        /// Generates the term frequency inverse document frequency
         /// </summary>
         /// <param name="totalWords">Total words in the document</param>
         /// <param name="totalScripts">Total Scripts in corpus</param>
-        public void TFIDF(int totalWords, int totalScripts)
+        /// <param name="scriptsContainingWord">The count of the scripts that are containing the word</param>
+        public void CalculateTFIDF(int totalWords, int totalScripts, int scriptsContainingWord)
         {
-            double TFword = (double) m_Count / totalWords;
-            double IF = Math.Log((double)totalScripts / /*number of documents with term inside it*/ 1);
+            double TFword = (double)this.m_Count / totalWords;
+            double IF = 1 + Math.Log((double)totalScripts / scriptsContainingWord);
 
-            this.m_TFIDF = TFword / IF;
+            if (IF != 0)
+            {
+                this.m_TFIDF = TFword / IF;
+            }
+            else
+            {
+                this.m_TFIDF = this.m_Probability;
+            }
         }
     }
 }
