@@ -39,6 +39,14 @@ namespace AIAssignment.Network
         /// </summary>
         private readonly Dictionary<string, int> m_WordsDictionary = new Dictionary<string, int>();
 
+        /// <summary>
+        /// The nGram words and how often they occur
+        /// </summary>
+        private Dictionary<string,int> m_NGramDictionary = new Dictionary<string,int>();
+
+        /// <summary>
+        /// The script file name
+        /// </summary>
         private string m_FileName;
 
         /// <summary>
@@ -51,6 +59,7 @@ namespace AIAssignment.Network
             this.m_FileName = this.m_File.FullName;
             this.m_Stopwords = File.ReadAllLines(Directory.GetCurrentDirectory() + "\\stopwords.txt");
             this.GetScript();
+            this.m_NGramDictionary = NGram.CreateNGramFromScript(this.m_SpeechScript);
             this.FillDictionary();
         }
 
@@ -62,6 +71,7 @@ namespace AIAssignment.Network
             this.m_File = new FileInfo(this.FileName);
             this.m_Stopwords = File.ReadAllLines(Directory.GetCurrentDirectory() + "\\stopwords.txt");
             this.GetScript();
+            this.m_NGramDictionary = NGram.CreateNGramFromScript(this.m_SpeechScript);
             this.FillDictionary();
         }
 
@@ -90,6 +100,12 @@ namespace AIAssignment.Network
         public string SpeechScript
         {
             get => m_SpeechScript;
+        }
+
+        public Dictionary<string, int> NGramDictionary
+        {
+            get => this.m_NGramDictionary;
+            set => this.m_NGramDictionary = value;
         }
 
         /// <summary>

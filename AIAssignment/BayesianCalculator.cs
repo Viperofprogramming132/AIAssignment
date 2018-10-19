@@ -47,6 +47,10 @@ namespace AIAssignment.Network
         /// <returns>probability of the new document occurring</returns>
         public static double DocumentProbability(List<Probability> wordProbabilities, double categoryProbability)
         {
+            if (wordProbabilities.Count == 0)
+            {
+                return 0;
+            }
             double docProbability = Math.Log(wordProbabilities[0].TermFrequencyProbability);
             wordProbabilities.RemoveAt(0);
 

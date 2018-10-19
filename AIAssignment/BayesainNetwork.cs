@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -44,9 +45,20 @@ namespace AIAssignment.Network
             new Dictionary<Category, List<Probability>>();
 
         /// <summary>
+        /// The list of a list of probabilities that the nGrams are found in both the category and the document to classify
+        /// </summary>
+        private Dictionary<Category, List<Probability>> m_NGramsFoundInCategoryList =
+            new Dictionary<Category, List<Probability>>();
+
+        /// <summary>
         /// The dictionary containing the category that the document was compared against with the probability of it being that category
         /// </summary>
         Dictionary<Category, double> m_CategoryProbabilities = new Dictionary<Category, double>();
+
+        /// <summary>
+        /// The dictionary containing the category that the document was compared against with the probability of it being that category that is calculated using nGrams
+        /// </summary>
+        Dictionary<Category, double> m_CategoryProbabilitiesWithNGrams = new Dictionary<Category, double>();
 
         /// <summary>
         /// Party names based off selected data
@@ -57,6 +69,11 @@ namespace AIAssignment.Network
             set => this.m_Categories = value;
         }
 
+        /// <summary>
+        /// Gets all the .txt files in the given directory and outputs them to the console
+        /// </summary>
+        /// <param name="workingDirectory">The directory to look for the txt files</param>
+        /// <returns>Array of all the files</returns>
         private FileInfo[] GetFilesInLocation(string workingDirectory)
         {
             //Get the directory and all the files inside of it
@@ -193,8 +210,7 @@ namespace AIAssignment.Network
             //If the total does not add to 1 then there is something wrong with the math
             if (Math.Abs(errorCheck - 1.0D) > 0.0000001)
             {
-                Console.WriteLine(@"Error: Probability does not add to 100%");
-                Console.ReadLine();
+                Debug.WriteLine(@"Error: Probability does not add to 100%");
             }
         }
 
@@ -205,7 +221,7 @@ namespace AIAssignment.Network
         {
             //Used to work out total words/Ngrams
             Dictionary<string, int> wordsDictionary = new Dictionary<string, int>();
-            Dictionary<string, int> NGramDictionary = new Dictionary<string, int>();
+            Dictionary<string, int> nGramDictionary = new Dictionary<string, int>();
 
             foreach (Category category in this.Categories)
             {
@@ -228,13 +244,13 @@ namespace AIAssignment.Network
                 //Get all Ngrams to calculate total
                 foreach (KeyValuePair<string, int> pair in category.GetCategoryNGramDictionary())
                 {
-                    if (NGramDictionary.ContainsKey(pair.Key))
+                    if (nGramDictionary.ContainsKey(pair.Key))
                     {
-                        NGramDictionary[pair.Key] += pair.Value;
+                        nGramDictionary[pair.Key] += pair.Value;
                     }
                     else
                     {
-                        NGramDictionary.Add(pair.Key, pair.Value);
+                        nGramDictionary.Add(pair.Key, pair.Value);
                     }
                 }
             }
@@ -242,7 +258,7 @@ namespace AIAssignment.Network
             //Calculates P(word|category)
             foreach (Category category in this.Categories)
             {
-                category.CalculateWordProb(wordsDictionary.Count,NGramDictionary.Count);
+                category.CalculateWordProb(wordsDictionary.Count,nGramDictionary.Count);
             }
         }
 
@@ -253,24 +269,35 @@ namespace AIAssignment.Network
         {
             int totalDocuments = 0;
             Dictionary<Speech, List<string>> wordsToSpeeches = new Dictionary<Speech, List<string>>();
+            Dictionary<Speech, List<string>> nGramsToSpeeches = new Dictionary<Speech, List<string>>();
+
             foreach (Category category in this.m_Categories)
             {
                 totalDocuments += category.GetCategorySpeeches().Count;
                 foreach (Speech speech in category.GetCategorySpeeches())
                 {
+                    //Get all the contained words in every speech
                     List<string> containedWords = new List<string>();
                     foreach (KeyValuePair<string, int> words in speech.WordsDictionary)
                     {
                         containedWords.Add(words.Key);
                     }
 
+                    //Get all the contained nGrams in every speech
+                    List<string> containedNGrams = new List<string>();
+                    foreach (KeyValuePair<string, int> words in speech.NGramDictionary)
+                    {
+                        containedNGrams.Add(words.Key);
+                    }
+
+                    nGramsToSpeeches.Add(speech, containedNGrams);
                     wordsToSpeeches.Add(speech, containedWords);
                 }
             }
 
             foreach (Category category in this.m_Categories)
             {
-                category.CalculateTFIDF(totalDocuments, wordsToSpeeches);
+                category.CalculateTFIDF(totalDocuments, wordsToSpeeches, nGramsToSpeeches);
             }
         }
 
@@ -287,6 +314,8 @@ namespace AIAssignment.Network
             this.m_WordsFoundInCategoryList = new Dictionary<Category, List<Probability>>();
             this.m_CategoryProbabilities = new Dictionary<Category, double>();
             this.m_ClassifyDocument = null;
+            this.m_NGramsFoundInCategoryList = new Dictionary<Category, List<Probability>>();
+            this.m_CategoryProbabilitiesWithNGrams = new Dictionary<Category, double>();
 
             this.SelectDocument();
             this.FindExistingWords();
@@ -323,9 +352,12 @@ namespace AIAssignment.Network
                     badInput = true;
                 }
 
-                //Write out selected files
-                Console.WriteLine(@"Selected file is:");
-                Console.WriteLine(this.m_ClassifyDocument.FileInf.Name);
+                if (!badInput)
+                {
+                    //Write out selected files
+                    Console.WriteLine(@"Selected file is:");
+                    Console.WriteLine(this.m_ClassifyDocument.FileInf.Name);
+                }
 
                 //Ensure there is no bad inputs
                 if (badInput)
@@ -352,10 +384,9 @@ namespace AIAssignment.Network
         /// </summary>
         private void FindExistingWords()
         {
-            for (int index = 0; index < this.Categories.Count; index++)
+            foreach (Category category in this.Categories)
             {
-                Category category = this.Categories[index];
-
+                //Find the common words between the category documents and the one to classify
                 List<Probability> commonWordList = new List<Probability>();
 
                 foreach (KeyValuePair<string, int> wordPair in this.m_ClassifyDocument.WordsDictionary)
@@ -370,6 +401,22 @@ namespace AIAssignment.Network
                 }
 
                 this.m_WordsFoundInCategoryList.Add(category, commonWordList);
+
+                //Find the common nGrams between the category documents and the one to classify
+                List<Probability> commonNGramList = new List<Probability>();
+
+                foreach (KeyValuePair<string, int> wordPair in this.m_ClassifyDocument.NGramDictionary)
+                {
+                    foreach (Probability cateWord in category.NGramWordProbabilities)
+                    {
+                        if (wordPair.Key == cateWord.Word)
+                        {
+                            commonNGramList.Add(cateWord);
+                        }
+                    }
+                }
+
+                this.m_NGramsFoundInCategoryList.Add(category, commonNGramList);
             }
         }
 
@@ -378,11 +425,20 @@ namespace AIAssignment.Network
         /// </summary>
         private void GetProbabilities()
         {
+            //Calculate the probabilities of the document being in each category by using word TFIDF probability
             foreach (KeyValuePair<Category, List<Probability>> categoryWordPair in this.m_WordsFoundInCategoryList)
             {
                 this.m_CategoryProbabilities.Add(
                     categoryWordPair.Key,
                     BayesianCalculator.DocumentProbability(categoryWordPair.Value, categoryWordPair.Key.Probability));
+            }
+
+            //Calculate the probabilities of the document being in each category by using word nGram and TFIDF probability
+            foreach (KeyValuePair<Category, List<Probability>> categoryNGramPair in this.m_NGramsFoundInCategoryList)
+            {
+                this.m_CategoryProbabilitiesWithNGrams.Add(
+                    categoryNGramPair.Key,
+                    BayesianCalculator.DocumentProbability(categoryNGramPair.Value, categoryNGramPair.Key.Probability));
             }
         }
 
@@ -391,18 +447,72 @@ namespace AIAssignment.Network
         /// </summary>
         private void OutputResult()
         {
+            List<string> outputs = new List<string>();
+
+            //Gets the smallest number due to larger probability being a larger negative due to logarithms
             int indexOfLargest = this.m_CategoryProbabilities.Values.ToList()
                 .IndexOf(this.m_CategoryProbabilities.Values.Min());
-            Console.WriteLine(
-                "\nThe file " + this.m_ClassifyDocument.FileInf.Name + @" is classified under the "
-                + this.m_CategoryProbabilities.Keys.ToList()[indexOfLargest] + @" category");
-            string[] output =
-                {
-                    "\nThe file " + this.m_ClassifyDocument.FileInf.Name + @" is classified under the "
-                    + this.m_CategoryProbabilities.Keys.ToList()[indexOfLargest] + @" category"
-                };
-            File.AppendAllLines("results.txt", output);
+
+            //Add the normal calculation to the results using TFIDF
+            outputs.Add("\nThe file " + this.m_ClassifyDocument.FileInf.Name + @" is classified under the " + this.m_CategoryProbabilities.Keys.ToList()[indexOfLargest] + @" category using TFIDF");
+
+            //Do it again for using nGrams
+            indexOfLargest = this.m_CategoryProbabilitiesWithNGrams.Values.ToList()
+                .IndexOf(this.m_CategoryProbabilitiesWithNGrams.Values.Min());
+
+            outputs.Add("\nThe file " + this.m_ClassifyDocument.FileInf.Name + @" is classified under the " + this.m_CategoryProbabilities.Keys.ToList()[indexOfLargest] + " category using nGrams and TFIDF\n\n");
+
+            //Output results
+            foreach (string output in outputs)
+            {
+                Console.WriteLine(output);
+            }
+
+            //Display probability in percentage for TFIDF probabilities
+            foreach (KeyValuePair<Category,double> percentageKeyValuePair in this.CalculatePercentage(this.m_CategoryProbabilities))
+            {
+                Console.WriteLine("Probability of " + percentageKeyValuePair.Key + " is " + percentageKeyValuePair.Value + " using TFIDF");
+            }
+
+            //Display probability in percentage for nGram and TFIDF probabilities
+            foreach (KeyValuePair<Category, double> percentageKeyValuePair in this.CalculatePercentage(this.m_CategoryProbabilitiesWithNGrams))
+            {
+                Console.WriteLine("Probability of " + percentageKeyValuePair.Key + " is " + percentageKeyValuePair.Value + " using nGrams and TFIDF");
+            }
+
+            //Write it to a file so it can be checked later
+            File.AppendAllLines("results.txt", outputs);
             Console.ReadKey();
+        }
+
+
+        /// <summary>
+        /// Calculates the percentage probability of the categories occurring for displaying
+        /// </summary>
+        /// <param name="probabilityDictionary"></param>
+        /// <returns></returns>
+        private Dictionary<Category, double> CalculatePercentage(Dictionary<Category,double> probabilityDictionary)
+        {
+            Dictionary<Category, double> categoryPercentageDictionary = new Dictionary<Category, double>();
+            //Sum them to divide by
+            double total = probabilityDictionary.Sum(x => x.Value);
+            //Make sure they are positive as they default to negative
+            total = total * -1;
+            foreach (KeyValuePair<Category,double> categoryProbabilityPair in probabilityDictionary)
+            {
+                categoryPercentageDictionary.Add(
+                    categoryProbabilityPair.Key,
+                    ((categoryProbabilityPair.Value * -1) / total)*100);
+            }
+
+            double errorCheck = categoryPercentageDictionary.Sum(x => x.Value);
+
+            if (Math.Abs(errorCheck - 100.0D) > 0.1)
+            {
+                Debug.WriteLine("Percentages do not add to 100%");
+            }
+
+            return categoryPercentageDictionary;
         }
 
         #endregion
