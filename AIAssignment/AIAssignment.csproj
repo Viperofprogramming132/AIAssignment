@@ -46,6 +46,7 @@
     <Compile Include="BayesianCalculator.cs" />
     <Compile Include="BayesianManager.cs" />
     <Compile Include="Category.cs" />
+    <Compile Include="NGram.cs" />
     <Compile Include="Probability.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

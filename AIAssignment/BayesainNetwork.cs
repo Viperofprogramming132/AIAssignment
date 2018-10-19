@@ -40,8 +40,8 @@ namespace AIAssignment.Network
         /// <summary>
         /// The list of a list of probabilities that the words are found in both the category and the document to classify
         /// </summary>
-        private List<Dictionary<Category, List<Probability>>> m_WordsFoundInCategoryList =
-            new List<Dictionary<Category, List<Probability>>>();
+        private Dictionary<Category, List<Probability>> m_WordsFoundInCategoryList =
+            new Dictionary<Category, List<Probability>>();
 
         /// <summary>
         /// The dictionary containing the category that the document was compared against with the probability of it being that category
@@ -203,8 +203,9 @@ namespace AIAssignment.Network
         /// </summary>
         private void CalculateCategoryProbabilities()
         {
-            //Used to work out total words
+            //Used to work out total words/Ngrams
             Dictionary<string, int> wordsDictionary = new Dictionary<string, int>();
+            Dictionary<string, int> NGramDictionary = new Dictionary<string, int>();
 
             foreach (Category category in this.Categories)
             {
@@ -223,12 +224,25 @@ namespace AIAssignment.Network
                         wordsDictionary.Add(pair.Key, pair.Value);
                     }
                 }
-            }
 
+                //Get all Ngrams to calculate total
+                foreach (KeyValuePair<string, int> pair in category.GetCategoryNGramDictionary())
+                {
+                    if (NGramDictionary.ContainsKey(pair.Key))
+                    {
+                        NGramDictionary[pair.Key] += pair.Value;
+                    }
+                    else
+                    {
+                        NGramDictionary.Add(pair.Key, pair.Value);
+                    }
+                }
+            }
+            
             //Calculates P(word|category)
             foreach (Category category in this.Categories)
             {
-                category.CalculateWordProb(wordsDictionary.Count);
+                category.CalculateWordProb(wordsDictionary.Count,NGramDictionary.Count);
             }
         }
 
@@ -270,7 +284,7 @@ namespace AIAssignment.Network
         public void ClassifyDocument()
         {
             //Ensure nothing is taken from the last classification
-            this.m_WordsFoundInCategoryList = new List<Dictionary<Category, List<Probability>>>();
+            this.m_WordsFoundInCategoryList = new Dictionary<Category, List<Probability>>();
             this.m_CategoryProbabilities = new Dictionary<Category, double>();
             this.m_ClassifyDocument = null;
 
@@ -342,8 +356,6 @@ namespace AIAssignment.Network
             {
                 Category category = this.Categories[index];
 
-                this.m_WordsFoundInCategoryList.Add(new Dictionary<Category, List<Probability>>());
-
                 List<Probability> commonWordList = new List<Probability>();
 
                 foreach (KeyValuePair<string, int> wordPair in this.m_ClassifyDocument.WordsDictionary)
@@ -357,7 +369,7 @@ namespace AIAssignment.Network
                     }
                 }
 
-                this.m_WordsFoundInCategoryList[index].Add(category, commonWordList);
+                this.m_WordsFoundInCategoryList.Add(category, commonWordList);
             }
         }
 
@@ -366,14 +378,11 @@ namespace AIAssignment.Network
         /// </summary>
         private void GetProbabilities()
         {
-            foreach (Dictionary<Category, List<Probability>> categoryWordPair in this.m_WordsFoundInCategoryList)
+            foreach (KeyValuePair<Category, List<Probability>> categoryWordPair in this.m_WordsFoundInCategoryList)
             {
-                foreach (Category category in categoryWordPair.Keys)
-                {
-                    this.m_CategoryProbabilities.Add(
-                        category,
-                        BayesianCalculator.DocumentProbability(categoryWordPair[category], category.Probability));
-                }
+                this.m_CategoryProbabilities.Add(
+                    categoryWordPair.Key,
+                    BayesianCalculator.DocumentProbability(categoryWordPair.Value, categoryWordPair.Key.Probability));
             }
         }
 

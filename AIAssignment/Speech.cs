@@ -39,6 +39,8 @@ namespace AIAssignment.Network
         /// </summary>
         private readonly Dictionary<string, int> m_WordsDictionary = new Dictionary<string, int>();
 
+        private string m_FileName;
+
         /// <summary>
         /// Constructor for the Speech gets all the information from the files
         /// </summary>
@@ -46,7 +48,7 @@ namespace AIAssignment.Network
         public Speech(FileInfo file)
         {
             this.m_File = file;
-            this.FileName = this.m_File.FullName;
+            this.m_FileName = this.m_File.FullName;
             this.m_Stopwords = File.ReadAllLines(Directory.GetCurrentDirectory() + "\\stopwords.txt");
             this.GetScript();
             this.FillDictionary();
@@ -79,7 +81,16 @@ namespace AIAssignment.Network
             get => this.m_WordsDictionary;
         }
 
-        public string FileName { get; set; }
+        public string FileName
+        {
+            get => m_FileName;
+            private set => m_FileName = value;
+        }
+
+        public string SpeechScript
+        {
+            get => m_SpeechScript;
+        }
 
         /// <summary>
         /// Gets the speech from the file and removes all non verbal content

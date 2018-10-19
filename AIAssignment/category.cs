@@ -40,6 +40,16 @@ namespace AIAssignment.Network
         private List<Probability> m_WordProbabilities = new List<Probability>();
 
         /// <summary>
+        /// Contains all the ngram and the counts with the P(word|category)
+        /// </summary>
+        private List<Probability> m_NGramWordProbabilities = new List<Probability>();
+
+        /// <summary>
+        /// Dictionary for containing the Ngrams and their words
+        /// </summary>
+        Dictionary<string, int> m_NGramDictionary = new Dictionary<string, int>();
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Category"/> class. 
         /// </summary>
         /// <param name="name">
@@ -80,12 +90,29 @@ namespace AIAssignment.Network
         }
 
         /// <summary>
+        /// Gets the category NGram dictionary.
+        /// </summary>
+        public Dictionary<string, int> GetCategoryNGramDictionary()
+        {
+            return this.m_NGramDictionary;
+        }
+
+        /// <summary>
         /// Gets the word probabilities.
         /// </summary>
         public List<Probability> WordProbabilities
         {
             get => this.m_WordProbabilities;
             set => this.m_WordProbabilities = value;
+        }
+
+        /// <summary>
+        /// Gets the Ngram probabilities.
+        /// </summary>
+        public List<Probability> NGramWordProbabilities
+        {
+            get => this.m_NGramWordProbabilities;
+            set => this.m_NGramWordProbabilities = value;
         }
 
         /// <summary>
@@ -127,16 +154,29 @@ namespace AIAssignment.Network
                         this.m_CategoryWordsDictionary.Add(pair.Key, pair.Value);
                     }
                 }
+
+                foreach (KeyValuePair<string,int> pair in NGram.CreateNGramFromScript(speech.SpeechScript))
+                {
+                    if (this.m_NGramDictionary.ContainsKey(pair.Key))
+                    {
+                        this.m_NGramDictionary[pair.Key] += pair.Value;
+                    }
+                    else
+                    {
+                        this.m_NGramDictionary.Add(pair.Key, pair.Value);
+                    }
+                }
             }
         }
 
         /// <summary>
         /// The calculate word prob.
         /// </summary>
-        /// <param name="TotalWords">
+        /// <param name="totalWords">
         /// The total unique words.
         /// </param>
-        public void CalculateWordProb(int TotalWords)
+        /// <param name="totalNGrams">The total unique Ngrams</param>
+        public void CalculateWordProb(int totalWords,int totalNGrams)
         {
             foreach (KeyValuePair<string, int> pair in this.m_CategoryWordsDictionary)
             {
@@ -147,7 +187,17 @@ namespace AIAssignment.Network
                         BayesianCalculator.WordProbability(
                             pair.Value,
                             this.m_CategoryWordsDictionary.Sum(x => x.Value),
-                            TotalWords)));
+                            totalWords)));
+            }
+
+            
+
+            foreach (Speech speech in m_CategorySpeeches)
+            {
+                foreach (KeyValuePair<string,int> Ngrams in m_NGramDictionary)
+                {
+                    this.m_NGramWordProbabilities.Add(new Probability(Ngrams.Key, Ngrams.Value, BayesianCalculator.WordProbability(Ngrams.Value, m_NGramDictionary.Sum(x => x.Value),totalNGrams)));
+                }
             }
         }
 
