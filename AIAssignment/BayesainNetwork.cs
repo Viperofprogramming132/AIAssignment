@@ -490,7 +490,7 @@ namespace AIAssignment.Network
         /// Calculates the percentage probability of the categories occurring for displaying
         /// </summary>
         /// <param name="probabilityDictionary"></param>
-        /// <returns></returns>
+        /// <returns>The Category paired with a double which is the percentage over all the given doubles</returns>
         private Dictionary<Category, double> CalculatePercentage(Dictionary<Category,double> probabilityDictionary)
         {
             Dictionary<Category, double> categoryPercentageDictionary = new Dictionary<Category, double>();
