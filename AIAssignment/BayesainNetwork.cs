@@ -174,6 +174,7 @@ namespace AIAssignment.Network
         /// </summary>
         private void SetCategories()
         {
+            List<Task> tasks = new List<Task>();
             foreach (Speech file in this.m_TrainingDataFiles)
             {
                 foreach (string name in this.m_PartyNames)
@@ -193,6 +194,13 @@ namespace AIAssignment.Network
                         }
                     }
                 }
+
+                tasks.Add(Task.Run(() => file.FillNgrams()));
+            }
+
+            foreach(Task t in tasks)
+            {
+                t.Wait();
             }
 
             double errorCheck = 0;
@@ -377,6 +385,8 @@ namespace AIAssignment.Network
                 }
             }
             while (retry);
+
+            Task.WaitAll(Task.Run(() => this.m_ClassifyDocument.FillNgrams()));
         }
 
         /// <summary>
@@ -384,6 +394,7 @@ namespace AIAssignment.Network
         /// </summary>
         private void FindExistingWords()
         {
+            
             foreach (Category category in this.Categories)
             {
                 //Find the common words between the category documents and the one to classify

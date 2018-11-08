@@ -59,7 +59,6 @@ namespace AIAssignment.Network
             this.m_FileName = this.m_File.FullName;
             this.m_Stopwords = File.ReadAllLines(Directory.GetCurrentDirectory() + "\\stopwords.txt");
             this.GetScript();
-            this.m_NGramDictionary = NGram.CreateNGramFromScript(this.m_SpeechScript);
             this.FillDictionary();
         }
 
@@ -71,7 +70,6 @@ namespace AIAssignment.Network
             this.m_File = new FileInfo(this.FileName);
             this.m_Stopwords = File.ReadAllLines(Directory.GetCurrentDirectory() + "\\stopwords.txt");
             this.GetScript();
-            this.m_NGramDictionary = NGram.CreateNGramFromScript(this.m_SpeechScript);
             this.FillDictionary();
         }
 
@@ -166,6 +164,11 @@ namespace AIAssignment.Network
                     }
                 }
             }
+        }
+
+        public async Task FillNgrams()
+        {
+            this.m_NGramDictionary = NGram.CreateNGramFromScript(this.m_SpeechScript);
         }
     }
 }

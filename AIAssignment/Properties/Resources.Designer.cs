@@ -119,6 +119,64 @@ namespace AIAssignment.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to a/a
+        ///a/AAA
+        ///a/an
+        ///a/and
+        ///a/another
+        ///a/B+
+        ///a/B-
+        ///a/B-
+        ///a/B-
+        ///a/B-movie
+        ///a/B-plus
+        ///a/B.
+        ///a/B.A.
+        ///a/B.F.A
+        ///a/B.S.
+        ///a/BA
+        ///a/babble
+        ///a/babbling
+        ///a/babe
+        ///a/baboon
+        ///a/baby
+        ///A/baby
+        ///a/Baby
+        ///A/BABY
+        ///a/BABY
+        ///a/baby-faced
+        ///a/baby-sitter
+        ///a/babysitter
+        ///a/baccalaureate
+        ///a/Bach
+        ///a/bachelor
+        ///a/Bachelor
+        ///A/bachelor
+        ///a/bachelorette
+        ///a/bachelors
+        ///a/back
+        ///A/back
+        ///a/back-and-forth
+        ///a/back-door
+        ///a/back-to-basics
+        ///a/back-to-school
+        ///a/back-up
+        ///a/backboard
+        ///a/backbone
+        ///a/backcountry
+        ///a/backdoor
+        ///a/backdrop
+        ///a/backer
+        ///a/backfire
+        ///a [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Ngrams {
+            get {
+                return ResourceManager.GetString("Ngrams", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to a
         ///about
         ///above
