@@ -1,7 +1,7 @@
 ﻿// Project: AIAssignment
 // Filename; BayesianCalculator.cs
 // Created; 10/10/2018
-// Edited: 16/10/2018
+// Edited: 17/11/2018
 
 using System;
 using System.Collections.Generic;
@@ -51,6 +51,7 @@ namespace AIAssignment.Network
             {
                 return 0;
             }
+
             double docProbability = Math.Log(wordProbabilities[0].TermFrequencyProbability);
             wordProbabilities.RemoveAt(0);
 

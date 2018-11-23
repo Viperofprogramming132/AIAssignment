@@ -1,7 +1,7 @@
 ﻿// Project: AIAssignment
 // Filename; Category.cs
 // Created; 10/10/2018
-// Edited: 16/10/2018
+// Edited: 17/11/2018
 
 using System;
 using System.Collections.Generic;
@@ -47,7 +47,7 @@ namespace AIAssignment.Network
         /// <summary>
         /// Dictionary for containing the nGrams and their words
         /// </summary>
-        Dictionary<string, int> m_NGramDictionary = new Dictionary<string, int>();
+        readonly Dictionary<string, int> m_NGramDictionary = new Dictionary<string, int>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Category"/> class. 
@@ -156,9 +156,8 @@ namespace AIAssignment.Network
 
                 Dictionary<string, int> nGramDictionary = speech.NGramDictionary;
 
-                foreach (KeyValuePair<string,int> pair in nGramDictionary)
+                foreach (KeyValuePair<string, int> pair in nGramDictionary)
                 {
-                    
                     if (this.m_NGramDictionary.ContainsKey(pair.Key))
                     {
                         this.m_NGramDictionary[pair.Key] += pair.Value;
@@ -176,7 +175,7 @@ namespace AIAssignment.Network
         /// </summary>
         /// <param name="totalWords">The total unique words</param>
         /// <param name="totalNGrams">The total unique nGrams</param>
-        public void CalculateWordProb(int totalWords,int totalNGrams)
+        public void CalculateWordProb(int totalWords, int totalNGrams)
         {
             foreach (KeyValuePair<string, int> pair in this.m_CategoryWordsDictionary)
             {
@@ -190,12 +189,18 @@ namespace AIAssignment.Network
                             totalWords)));
             }
 
-
             foreach (Speech speech in this.m_CategorySpeeches)
             {
-                foreach (KeyValuePair<string,int> nGrams in this.m_NGramDictionary)
+                foreach (KeyValuePair<string, int> nGrams in this.m_NGramDictionary)
                 {
-                    this.m_NGramWordProbabilities.Add(new Probability(nGrams.Key, nGrams.Value, BayesianCalculator.WordProbability(nGrams.Value, this.m_NGramDictionary.Sum(x => x.Value), totalNGrams)));
+                    this.m_NGramWordProbabilities.Add(
+                        new Probability(
+                            nGrams.Key,
+                            nGrams.Value,
+                            BayesianCalculator.WordProbability(
+                                nGrams.Value,
+                                this.m_NGramDictionary.Sum(x => x.Value),
+                                totalNGrams)));
                 }
             }
         }
@@ -206,13 +211,16 @@ namespace AIAssignment.Network
         /// <param name="totalDocuments">The total Speeches across all categories</param>
         /// <param name="wordsToSpeeches">Dictionary of the speeches with all of their words</param>
         /// <param name="nGramToSpeeches">Dictionary of the speeches with all of their nGrams</param>
-        public void CalculateTFIDF(int totalDocuments, Dictionary<Speech, List<string>> wordsToSpeeches, Dictionary<Speech, List<string>> nGramToSpeeches)
+        public void CalculateTFIDF(
+            int totalDocuments,
+            Dictionary<Speech, List<string>> wordsToSpeeches,
+            Dictionary<Speech, List<string>> nGramToSpeeches)
         {
             foreach (Probability probability in this.m_WordProbabilities)
             {
                 //Calculate the scripts contain the word
                 int scriptsContainingWord = 0;
-                
+
                 foreach (KeyValuePair<Speech, List<string>> wordsToSpeechPair in wordsToSpeeches)
                 {
                     foreach (string word in wordsToSpeechPair.Value)

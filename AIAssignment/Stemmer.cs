@@ -1,7 +1,7 @@
 ﻿// Project: AIAssignment
 // Filename; Stemmer.cs
 // Created; 14/10/2018
-// Edited: 16/10/2018
+// Edited: 17/11/2018
 
 using System.Collections.Generic;
 using System.Linq;
@@ -14,13 +14,6 @@ namespace AIAssignment.Network
     /// </summary>
     public class Stemmer
     {
-        /// <summary>
-        /// Gets the alphabet
-        /// https://stackoverflow.com/questions/314466/generating-an-array-of-letters-in-the-alphabet
-        /// </summary>
-        private readonly char[] m_Alphabet =
-            Enumerable.Range('a', 'z' - 'a' + 1).Select(c => (char)c).Concat(new[] { '\'' }).ToArray();
-
         /// <summary>
         /// Char array for the vowels of the alphabet
         /// </summary>

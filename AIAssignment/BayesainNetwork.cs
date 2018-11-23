@@ -1,7 +1,7 @@
 ﻿// Project: AIAssignment
 // Filename; BayesainNetwork.cs
 // Created; 10/10/2018
-// Edited: 16/10/2018
+// Edited: 17/11/2018
 
 using System;
 using System.Collections.Generic;
@@ -198,7 +198,7 @@ namespace AIAssignment.Network
                 tasks.Add(Task.Run(() => file.FillNgrams()));
             }
 
-            foreach(Task t in tasks)
+            foreach (Task t in tasks)
             {
                 t.Wait();
             }
@@ -262,11 +262,11 @@ namespace AIAssignment.Network
                     }
                 }
             }
-            
+
             //Calculates P(word|category)
             foreach (Category category in this.Categories)
             {
-                category.CalculateWordProb(wordsDictionary.Count,nGramDictionary.Count);
+                category.CalculateWordProb(wordsDictionary.Count, nGramDictionary.Count);
             }
         }
 
@@ -331,7 +331,6 @@ namespace AIAssignment.Network
             this.OutputResult();
         }
 
-
         /// <summary>
         /// Gets the documents from the test folder and asks the user which one they wish to use
         /// </summary>
@@ -394,7 +393,6 @@ namespace AIAssignment.Network
         /// </summary>
         private void FindExistingWords()
         {
-            
             foreach (Category category in this.Categories)
             {
                 //Find the common words between the category documents and the one to classify
@@ -465,13 +463,17 @@ namespace AIAssignment.Network
                 .IndexOf(this.m_CategoryProbabilities.Values.Min());
 
             //Add the normal calculation to the results using TFIDF
-            outputs.Add("\nThe file " + this.m_ClassifyDocument.FileInf.Name + @" is classified under the " + this.m_CategoryProbabilities.Keys.ToList()[indexOfLargest] + @" category using TFIDF");
+            outputs.Add(
+                "\nThe file " + this.m_ClassifyDocument.FileInf.Name + @" is classified under the "
+                + this.m_CategoryProbabilities.Keys.ToList()[indexOfLargest] + @" category using TFIDF");
 
             //Do it again for using nGrams
             indexOfLargest = this.m_CategoryProbabilitiesWithNGrams.Values.ToList()
                 .IndexOf(this.m_CategoryProbabilitiesWithNGrams.Values.Min());
 
-            outputs.Add("\nThe file " + this.m_ClassifyDocument.FileInf.Name + @" is classified under the " + this.m_CategoryProbabilities.Keys.ToList()[indexOfLargest] + " category using nGrams and TFIDF\n\n");
+            outputs.Add(
+                "\nThe file " + this.m_ClassifyDocument.FileInf.Name + @" is classified under the "
+                + this.m_CategoryProbabilities.Keys.ToList()[indexOfLargest] + " category using nGrams and TFIDF\n\n");
 
             //Output results
             foreach (string output in outputs)
@@ -480,15 +482,21 @@ namespace AIAssignment.Network
             }
 
             //Display probability in percentage for TFIDF probabilities
-            foreach (KeyValuePair<Category,double> percentageKeyValuePair in this.CalculatePercentage(this.m_CategoryProbabilities))
+            foreach (KeyValuePair<Category, double> percentageKeyValuePair in this.CalculatePercentage(
+                this.m_CategoryProbabilities))
             {
-                Console.WriteLine("Probability of " + percentageKeyValuePair.Key + " is " + percentageKeyValuePair.Value + " using TFIDF");
+                Console.WriteLine(
+                    @"Probability of " + percentageKeyValuePair.Key + @" is " + percentageKeyValuePair.Value
+                    + @"% using TFIDF");
             }
 
             //Display probability in percentage for nGram and TFIDF probabilities
-            foreach (KeyValuePair<Category, double> percentageKeyValuePair in this.CalculatePercentage(this.m_CategoryProbabilitiesWithNGrams))
+            foreach (KeyValuePair<Category, double> percentageKeyValuePair in this.CalculatePercentage(
+                this.m_CategoryProbabilitiesWithNGrams))
             {
-                Console.WriteLine("Probability of " + percentageKeyValuePair.Key + " is " + percentageKeyValuePair.Value + " using nGrams and TFIDF");
+                Console.WriteLine(
+                    @"Probability of " + percentageKeyValuePair.Key + @" is " + percentageKeyValuePair.Value
+                    + @"% using nGrams and TFIDF");
             }
 
             //Write it to a file so it can be checked later
@@ -496,24 +504,23 @@ namespace AIAssignment.Network
             Console.ReadKey();
         }
 
-
         /// <summary>
         /// Calculates the percentage probability of the categories occurring for displaying
         /// </summary>
-        /// <param name="probabilityDictionary"></param>
+        /// <param name="probabilityDictionary">Dictionary containing the the document with the logged probability of it being that category</param>
         /// <returns>The Category paired with a double which is the percentage over all the given doubles</returns>
-        private Dictionary<Category, double> CalculatePercentage(Dictionary<Category,double> probabilityDictionary)
+        private Dictionary<Category, double> CalculatePercentage(Dictionary<Category, double> probabilityDictionary)
         {
             Dictionary<Category, double> categoryPercentageDictionary = new Dictionary<Category, double>();
             //Sum them to divide by
             double total = probabilityDictionary.Sum(x => x.Value);
             //Make sure they are positive as they default to negative
             total = total * -1;
-            foreach (KeyValuePair<Category,double> categoryProbabilityPair in probabilityDictionary)
+            foreach (KeyValuePair<Category, double> categoryProbabilityPair in probabilityDictionary)
             {
                 categoryPercentageDictionary.Add(
                     categoryProbabilityPair.Key,
-                    ((categoryProbabilityPair.Value * -1) / total)*100);
+                    ((categoryProbabilityPair.Value * -1) / total) * 100);
             }
 
             double errorCheck = categoryPercentageDictionary.Sum(x => x.Value);

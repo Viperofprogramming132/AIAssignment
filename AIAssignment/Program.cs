@@ -1,7 +1,7 @@
 ﻿// Project: AIAssignment
 // Filename; Program.cs
 // Created; 10/10/2018
-// Edited: 16/10/2018
+// Edited: 17/11/2018
 
 using System;
 using System.Collections.Generic;
@@ -39,7 +39,7 @@ namespace AIAssignment
                     case 'q':
                         break;
                     default:
-                        Console.WriteLine("Please only input A, B or Q to exit (not case sensitive).");
+                        Console.WriteLine(@"Please only input A, B or Q to exit (not case sensitive).");
                         break;
                 }
             }

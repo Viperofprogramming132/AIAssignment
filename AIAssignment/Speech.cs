@@ -1,7 +1,7 @@
 ﻿// Project: AIAssignment
 // Filename; Speech.cs
 // Created; 10/10/2018
-// Edited: 16/10/2018
+// Edited: 17/11/2018
 
 using System;
 using System.Collections.Generic;
@@ -42,7 +42,7 @@ namespace AIAssignment.Network
         /// <summary>
         /// The nGram words and how often they occur
         /// </summary>
-        private Dictionary<string,int> m_NGramDictionary = new Dictionary<string,int>();
+        private Dictionary<string, int> m_NGramDictionary = new Dictionary<string, int>();
 
         /// <summary>
         /// The script file name
@@ -67,7 +67,7 @@ namespace AIAssignment.Network
         /// </summary>
         public Speech()
         {
-            this.m_File = new FileInfo(this.FileName);
+            this.m_File = new FileInfo(this.m_FileName);
             this.m_Stopwords = File.ReadAllLines(Directory.GetCurrentDirectory() + "\\stopwords.txt");
             this.GetScript();
             this.FillDictionary();
@@ -89,17 +89,10 @@ namespace AIAssignment.Network
             get => this.m_WordsDictionary;
         }
 
-        public string FileName
-        {
-            get => m_FileName;
-            private set => m_FileName = value;
-        }
 
-        public string SpeechScript
-        {
-            get => m_SpeechScript;
-        }
-
+        /// <summary>
+        /// Get and set for the N-Gram Dictionary
+        /// </summary>
         public Dictionary<string, int> NGramDictionary
         {
             get => this.m_NGramDictionary;
@@ -147,28 +140,52 @@ namespace AIAssignment.Network
         {
             Stemmer stemmer = new Stemmer();
             string[] words = this.m_SpeechScript.ToLower().Split(' ');
+            words = this.RemoveStopwords(words).ToArray();
 
             foreach (string word in words)
             {
                 //Checks if the word is not a stopword
-                if (!this.m_Stopwords.Any(x => x == word))
+                string stemmedWord = stemmer.StemWord(word);
+                if (this.m_WordsDictionary.ContainsKey(stemmedWord))
                 {
-                    string stemmedWord = stemmer.StemWord(word);
-                    if (this.m_WordsDictionary.ContainsKey(stemmedWord))
-                    {
-                        this.m_WordsDictionary[stemmedWord]++;
-                    }
-                    else
-                    {
-                        this.m_WordsDictionary.Add(stemmedWord, 1);
-                    }
+                    this.m_WordsDictionary[stemmedWord]++;
+                }
+                else
+                {
+                    this.m_WordsDictionary.Add(stemmedWord, 1);
                 }
             }
         }
 
+        /// <summary>
+        /// Removes all the stopwords from the script
+        /// </summary>
+        /// <param name="words">Array of all the words split up</param>
+        /// <returns>IEnumerable containing all the words that are not contained within the stopwords</returns>
+        private IEnumerable<string> RemoveStopwords(string[] words)
+        {
+            List<string> wordsList = new List<string>();
+
+            foreach (string word in words)
+            {
+                if (this.m_Stopwords.All(x => x != word))
+                {
+                    wordsList.Add(word);
+                }
+            }
+
+            return wordsList.AsEnumerable();
+        }
+
+        /// <summary>
+        /// Async task creating the n-gram dictionary from the script
+        /// </summary>
+        /// <returns>The Task that is running the function</returns>
         public async Task FillNgrams()
         {
-            this.m_NGramDictionary = NGram.CreateNGramFromScript(this.m_SpeechScript);
+            string[] words = this.m_SpeechScript.Split(' ');
+            string[] wordArray = this.RemoveStopwords(words).ToArray();
+            this.m_NGramDictionary = NGram.CreateNGramFromScript(wordArray);
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿// Project: AIAssignment
 // Filename; BayesianManager.cs
 // Created; 10/10/2018
-// Edited: 16/10/2018
+// Edited: 17/11/2018
 
 using System;
 using System.Collections.Generic;

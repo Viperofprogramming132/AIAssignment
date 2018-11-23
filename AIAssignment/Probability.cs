@@ -1,7 +1,7 @@
 ﻿// Project: AIAssignment
 // Filename; Probability.cs
 // Created; 10/10/2018
-// Edited: 16/10/2018
+// Edited: 17/11/2018
 
 using System;
 using System.Collections.Generic;
@@ -53,7 +53,7 @@ namespace AIAssignment.Network
         }
 
         /// <summary>
-        /// Blank constructor for serialization
+        /// Parameterless constructor for serialization
         /// </summary>
         public Probability()
         {
@@ -78,7 +78,7 @@ namespace AIAssignment.Network
         }
 
         /// <summary>
-        /// Gets the probability of occurrence.
+        /// Gets or sets the probability of occurrence. Used for serialization
         /// </summary>
         public double ProbabilityOfOccurrence
         {
@@ -87,7 +87,7 @@ namespace AIAssignment.Network
         }
 
         /// <summary>
-        /// Probability based off the frequency the word is used therefore more common words have less effect
+        /// Gets or sets the probability based off the frequency the word is used therefore more common words have less effect
         /// </summary>
         public double TermFrequencyProbability
         {
